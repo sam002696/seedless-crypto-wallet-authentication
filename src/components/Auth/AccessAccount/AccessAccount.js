@@ -26,17 +26,23 @@ const AccessAccount = () => {
       return;
     }
 
-    const challengeMessage = AuthUser.getChallengeMessage();
-    const web3 = new Web3();
+    let challengeMessage = AuthUser.getChallengeMessage();
 
+    // Web3.js will handle hashing and message prefixing internally
     try {
-      const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
-      console.log("Signature:", signature);
+      const web3 = new Web3();
+      const signature = await web3.eth.accounts.sign(
+        challengeMessage,
+        privateKey
+      );
 
+      console.log("Signature:", signature.signature);
+
+      // Send the signed challenge along with the public key to the backend
       dispatch(
         callApi({
           operationId: UrlBuilder.cryptowalletApi("auth/login/verify"),
-          output: "challengeMessage",
+          output: "loginVerify",
           parameters: {
             method: "POST",
             body: JSON.stringify({
