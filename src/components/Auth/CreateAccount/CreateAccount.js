@@ -91,28 +91,6 @@ const CreateAccount = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow-md sm:rounded-lg sm:px-12">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <p className="text-center text-sm text-gray-500">
-                    Not registered?{" "}
-                    <Link
-                      to="/signup"
-                      className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                    >
-                      Sign Up
-                    </Link>
-                  </p>
-                </div>
-
-                <div className="text-sm leading-6">
-                  <a
-                    href="#"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
 
               <div>
                 <button
