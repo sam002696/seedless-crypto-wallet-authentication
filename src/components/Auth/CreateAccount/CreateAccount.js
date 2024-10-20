@@ -34,11 +34,13 @@ const CreateAccount = () => {
     const web3 = new Web3();
     const account = web3.eth.accounts.create();
 
+    console.log("account", account);
+
     console.log("Private Key:", account.privateKey);
     console.log("Public Address:", account.address);
 
-    AuthUser.savePublicKey(account.privateKey);
-    AuthUser.savePrivateKey(account.address);
+    AuthUser.savePublicKey(account.address);
+    AuthUser.savePrivateKey(account.privateKey);
 
     dispatch(
       callApi({
@@ -52,7 +54,7 @@ const CreateAccount = () => {
     );
   };
 
-  console.log("Public", AuthUser.getPublicKey());
+  console.log("private key from localstorage", AuthUser.getPrivateKey());
 
   console.log("challengeMessage", challengeMessage?.data);
 
@@ -121,36 +123,37 @@ const CreateAccount = () => {
                   Generate Key Pair
                 </button>
               </div>
-              {AuthUser.getPublicKey().length > 0 && (
-                <>
-                  <div>
-                    <button
-                      type="button"
-                      className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      Public key : {AuthUser.getPublicKey()}
-                    </button>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      Private key : {AuthUser.getPrivateKey()}
-                    </button>
-                  </div>
+              {AuthUser.getPublicKey() &&
+                AuthUser.getPublicKey().length > 0 && (
+                  <>
+                    <div>
+                      <button
+                        type="button"
+                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        Public key : {AuthUser.getPublicKey()}
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        Private key : {AuthUser.getPrivateKey()}
+                      </button>
+                    </div>
 
-                  <div>
-                    <button
-                      onClick={() => handleSendPublicKey()}
-                      type="button"
-                      className="flex w-full justify-center rounded-md bg-cyan-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
-                    >
-                      Go to your wallet account
-                    </button>
-                  </div>
-                </>
-              )}
+                    <div>
+                      <button
+                        onClick={() => handleSendPublicKey()}
+                        type="button"
+                        className="flex w-full justify-center rounded-md bg-cyan-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+                      >
+                        Go to your wallet account
+                      </button>
+                    </div>
+                  </>
+                )}
             </div>
           </div>
 

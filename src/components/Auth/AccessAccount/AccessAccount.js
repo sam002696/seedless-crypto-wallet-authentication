@@ -17,61 +17,38 @@ const AccessAccount = () => {
   const handleSignChallengeMessage = async () => {
     let privateKey = AuthUser.getPrivateKey();
 
-    console.log("privateKey", privateKey);
-
-    // if (!privateKey) {
-    //   console.error("Private key not found in localStorage");
-    //   return;
-    // }
-
-    // // Ensure the private key is in the correct format (remove '0x' if present)
-    // if (privateKey.startsWith("0x")) {
-    //   privateKey = privateKey.slice(2); // Remove '0x' prefix
-    // }
-
-    // Validate private key length
-    // if (privateKey.length !== 64) {
-    //   console.error(
-    //     "Invalid private key length. Private key must be 32 bytes (64 characters)."
-    //   );
-    //   return;
-    // }
+    if (
+      !privateKey ||
+      privateKey.length !== 66 ||
+      !privateKey.startsWith("0x")
+    ) {
+      console.error("Invalid private key:", privateKey);
+      return;
+    }
 
     const challengeMessage = AuthUser.getChallengeMessage();
     const web3 = new Web3();
-    // try {
-    //   console.log("privateKey", privateKey.slice(3, -1));
-    //   const signature = web3.eth.accounts.sign(
-    //     challengeMessage,
-    //     privateKey.slice(3)
-    //   );
-    //   console.log("Signature:", signature);
 
-    //   dispatch(
-    //     callApi({
-    //       operationId: UrlBuilder.cryptowalletApi("auth/login/verify"),
-    //       output: "challengeMessage",
-    //       parameters: {
-    //         method: "POST",
-    //         body: JSON.stringify({
-    //           publicKey: AuthUser.getPublicKey(),
-    //           signature: signature.signature,
-    //         }),
-    //       },
-    //     })
-    //   );
-    // } catch (error) {
-    //   console.error("Error signing the challenge message:", error);
-    // }
+    try {
+      const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
+      console.log("Signature:", signature);
 
-    web3.eth
-      .sign(web3.eth.accounts.sign(challengeMessage, privateKey))
-      .then((signature) => {
-        console.log("Signed message:", signature);
-      })
-      .catch((err) => {
-        console.error("Error signing message:", err);
-      });
+      dispatch(
+        callApi({
+          operationId: UrlBuilder.cryptowalletApi("auth/login/verify"),
+          output: "challengeMessage",
+          parameters: {
+            method: "POST",
+            body: JSON.stringify({
+              publicKey: AuthUser.getPublicKey(),
+              signature: signature.signature,
+            }),
+          },
+        })
+      );
+    } catch (error) {
+      console.error("Error signing the challenge message:", error);
+    }
   };
 
   return (
