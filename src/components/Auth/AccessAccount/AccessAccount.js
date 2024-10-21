@@ -6,7 +6,7 @@ import Web3 from "web3";
 import { AuthUser } from "../../../helpers/AuthUser";
 import { useDispatch, useSelector } from "react-redux";
 import { UrlBuilder } from "../../../helpers/UrlBuilder";
-import { callApi, selectApi } from "../../../reducers/apiSlice";
+import { callApi, clearState, selectApi } from "../../../reducers/apiSlice";
 
 const AccessAccount = () => {
 
@@ -34,14 +34,15 @@ const AccessAccount = () => {
 
     try {
       // Add Ethereum prefix to the message
-      const prefix = `\x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage}`;
+      // const prefix = `\x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage}`;
 
-      const messageHash = web3.utils.sha3(prefix);
+      // const messageHash = web3.utils.sha3(prefix);
 
       // Sign the message hash
-      const signature = web3.eth.accounts.sign(messageHash, privateKey);
+      const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
       // const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
       console.log("Signature:", signature);
+      console.log("Public Key (Recovered from Signature):", web3.eth.accounts.recover(signature));
 
       dispatch(
         callApi({
@@ -62,11 +63,19 @@ const AccessAccount = () => {
   };
 
   useEffect(() => {
-    if (loginVerify ) {
+    if (loginVerify?.status === "success" ) {
       
       history.push("/user-account");
     }
-  }, [history, loginVerify]);
+  }, [history, loginVerify?.status]);
+
+  useEffect(() => {
+    dispatch(
+      clearState({
+        output: "loginVerify",
+      })
+    );
+  }, [loginVerify?.status, dispatch]);
 
   return (
     <>

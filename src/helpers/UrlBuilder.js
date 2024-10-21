@@ -12,8 +12,8 @@ class UrlBuilderHelper {
   }
 
   cryptowalletApi(path) {
-    // return `http://192.168.1.156:8081/${path}`; // alhaj bhai
-    return `http://192.168.1.243:8081/${path}`; // sami
+    return `http://192.168.1.156:8082/${path}`; // alhaj bhai
+    // return `http://192.168.1.243:8081/${path}`; // sami
   }
 }
 

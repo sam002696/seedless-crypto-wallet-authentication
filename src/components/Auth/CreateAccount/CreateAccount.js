@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import ArisPayLogo from "../../../../src/images/logo/arispay_logo.png";
 import { Link, useHistory } from "react-router-dom";
@@ -7,11 +7,42 @@ import { AuthUser } from "../../../helpers/AuthUser";
 import { useDispatch, useSelector } from "react-redux";
 import { UrlBuilder } from "../../../helpers/UrlBuilder";
 import { callApi, clearState, selectApi } from "../../../reducers/apiSlice";
+import { ClockIcon, LockClosedIcon } from '@heroicons/react/24/solid'
+// import ethUtil from "ethereumjs-util"; // Import ethereumjs-util
 
 const CreateAccount = () => {
   const { loading, challengeMessage } = useSelector(selectApi);
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
+  const [holding, setHolding] = useState(false);
+  const [holdTimer, setHoldTimer] = useState(null);
+
+  const handleMouseDown = () => {
+    setHolding(true);
+    const timer = setTimeout(() => {
+      setPrivateKeyVisible(true);
+      setHolding(false);
+    }, 3000); // 3 seconds
+    setHoldTimer(timer);
+  };
+
+  const handleMouseUp = () => {
+    setHolding(false);
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      setHoldTimer(null);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (holdTimer) {
+        clearTimeout(holdTimer); // Clear timer on component unmount
+      }
+    };
+  }, [holdTimer]);
 
   console.log("challengeMessage", challengeMessage);
 
@@ -34,10 +65,27 @@ const CreateAccount = () => {
     const web3 = new Web3();
     const account = web3.eth.accounts.create();
 
-    console.log("account", account);
+    const privateKey = account.privateKey;
+    const address = account.address;
 
-    console.log("Private Key:", account.privateKey);
-    console.log("Public Address:", account.address);
+    // Derive the public key from the private key
+    const derivedPublicKey = web3.eth.accounts.privateKeyToAccount(privateKey).publicKey; 
+    console.log("Public Key:", derivedPublicKey);
+
+
+
+    // Get public key from private key using ethereumjs-util
+    // const privateKeyBuffer = Buffer.from(privateKey.slice(2), "hex"); // Remove "0x" prefix from privateKey
+    // const publicKeyBuffer = ethUtil.privateToPublic(privateKeyBuffer);
+    // const publicKey = "0x" + publicKeyBuffer.toString("hex");
+
+    console.log("Public Key:", derivedPublicKey);
+    console.log("Private Key:", privateKey);
+    console.log("Public Address:", address);
+
+    // console.log("account", account);
+    // console.log("Private Key:", account.privateKey);
+    // console.log("Public Address:", account.address);
 
     AuthUser.savePublicKey(account.address);
     AuthUser.savePrivateKey(account.privateKey);
@@ -48,7 +96,7 @@ const CreateAccount = () => {
         output: "publicKey",
         parameters: {
           method: "POST",
-          body: JSON.stringify({ publicKey: account.privateKey }),
+          body: JSON.stringify({ publicKey: account.address }),
         },
       })
     );
@@ -57,6 +105,7 @@ const CreateAccount = () => {
   console.log("private key from localstorage", AuthUser.getPrivateKey());
 
   console.log("challengeMessage", challengeMessage?.data);
+  console.log("challengeMessage auth user", AuthUser?.getChallengeMessage());
 
   const handleSendPublicKey = () => {
     dispatch(
@@ -88,8 +137,8 @@ const CreateAccount = () => {
           </p>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-          <div className="bg-white px-6 py-12 shadow-md sm:rounded-lg sm:px-12">
+        <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-[480px]">
+          <div className="bg-white px-6 py-8 shadow-md sm:rounded-lg sm:px-12">
             <div className="space-y-6">
 
               <div>
@@ -105,21 +154,45 @@ const CreateAccount = () => {
                 AuthUser.getPublicKey().length > 0 && (
                   <>
                     <div>
+                      <div
+                        className="flex w-full justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 text-center"
+                      >
+                        Public key : <br/> 
+                        {AuthUser.getPublicKey()}
+                      </div>
+                    </div>
+                    {/* <div>
                       <button
                         type="button"
-                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className="flex w-full justify-center rounded-md bg-green-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 break-all"
                       >
-                        Public key : {AuthUser.getPublicKey()}
+                        Private key : <br/>
+                        {AuthUser.getPrivateKey()}
                       </button>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      >
-                        Private key : {AuthUser.getPrivateKey()}
-                      </button>
-                    </div>
+                    </div> */}
+
+<div>
+      <button
+        type="button"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp} // Clear timer if mouse leaves the button
+        className={`flex w-full justify-center rounded-md ${privateKeyVisible ? "bg-green-500" : "bg-green-400"} px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 break-all`}
+      >
+        {privateKeyVisible ? (
+          <>
+            Private key: <br />
+            {AuthUser.getPrivateKey()}
+          </>
+        ) : (
+          <>
+            <LockClosedIcon className={`mr-2 size-6 ${holding ? "animate-bounce" : ""}`} /> 
+            {/* Optional icon with animation */}
+            Hold the button to reveal the private key
+          </>
+        )}
+      </button>
+    </div>
 
                     <div>
                       <button
