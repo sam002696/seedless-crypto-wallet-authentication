@@ -28,12 +28,12 @@ const AccessAccount = () => {
       return;
     }
 
-    let challengeMessage = AuthUser.getChallengeMessage();
+    const challengeMessage = AuthUser.getChallengeMessage();
+    const web3 = new Web3();
 
-    // Web3.js will handle hashing and message prefixing internally
     try {
       // Add Ethereum prefix to the message
-      // const prefix = `\x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage}`;
+      // const prefix = \x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage};
 
       // const messageHash = web3.utils.sha3(prefix);
 
@@ -46,9 +46,6 @@ const AccessAccount = () => {
         web3.eth.accounts.recover(signature)
       );
 
-      console.log("Signature:", signature.signature);
-
-      // Send the signed challenge along with the public key to the backend
       dispatch(
         callApi({
           operationId: UrlBuilder.cryptowalletApi("auth/login/verify"),
