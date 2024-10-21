@@ -139,8 +139,9 @@ class AuthUserHelper {
 
   removeLoginData() {
     Cookies.set("access_token", "");
-    localStorage.setItem("auth_user", "");
-    localStorage.setItem("auth_roles", "");
+    localStorage.setItem("publicKey", "");
+    localStorage.setItem("privateKey", "");
+    localStorage.setItem("challenegeMessage", "");
     // localStorage.setItem("auth_user_institute", "");
   }
 }

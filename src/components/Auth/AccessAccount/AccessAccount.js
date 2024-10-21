@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 
 import ArisPayLogo from "../../../../src/images/logo/arispay_logo.png";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Web3 from "web3";
 import { AuthUser } from "../../../helpers/AuthUser";
 import { useDispatch, useSelector } from "react-redux";
 import { UrlBuilder } from "../../../helpers/UrlBuilder";
-import { callApi, selectApi } from "../../../reducers/apiSlice";
+import { callApi, clearState, selectApi } from "../../../reducers/apiSlice";
 
 const AccessAccount = () => {
+  const { loading, loginVerify } = useSelector(selectApi);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   console.log("Public", AuthUser.getPublicKey());
   console.log("Private", AuthUser.getPrivateKey());
@@ -30,10 +32,18 @@ const AccessAccount = () => {
 
     // Web3.js will handle hashing and message prefixing internally
     try {
-      const web3 = new Web3();
-      const signature = await web3.eth.accounts.sign(
-        challengeMessage,
-        privateKey
+      // Add Ethereum prefix to the message
+      // const prefix = `\x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage}`;
+
+      // const messageHash = web3.utils.sha3(prefix);
+
+      // Sign the message hash
+      const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
+      // const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
+      console.log("Signature:", signature);
+      console.log(
+        "Public Key (Recovered from Signature):",
+        web3.eth.accounts.recover(signature)
       );
 
       console.log("Signature:", signature.signature);
@@ -57,6 +67,20 @@ const AccessAccount = () => {
     }
   };
 
+  useEffect(() => {
+    if (loginVerify?.status === "success") {
+      history.push("/user-account");
+    }
+  }, [history, loginVerify?.status]);
+
+  useEffect(() => {
+    dispatch(
+      clearState({
+        output: "loginVerify",
+      })
+    );
+  }, [loginVerify?.status, dispatch]);
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -78,18 +102,15 @@ const AccessAccount = () => {
           <div className="bg-white px-6 py-12 shadow-md sm:rounded-lg sm:px-12">
             <div className="space-y-6">
               <div>
-                <button
-                  type="button"
-                  className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
+                <div className="flex w-full justify-center rounded-md bg-yellow-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600 text-center">
                   Challenge Message : {AuthUser.getChallengeMessage()}
-                </button>
+                </div>
                 <button
                   onClick={() => handleSignChallengeMessage()}
                   type="button"
-                  className="mt-12 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="mt-8 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  Click here to Sign the challenge Message with your Private key
+                  Click here to Sign the challenge Message
                 </button>
               </div>
             </div>
