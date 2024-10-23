@@ -75,28 +75,22 @@ class AuthUserHelper {
     return Cookies?.get("access_token")?.length > 0;
   }
 
-  saveLoginData(authData) {
+  saveLoginData(loginVerify) {
     // save token
-    let token = authData.accessToken || "";
-    Cookies.set("access_token", token, { expires: 15 });
+    let token =
+      JSON.parse(JSON.stringify(loginVerify)).data.accessToken !== undefined
+        ? JSON.parse(JSON.stringify(loginVerify)).data.accessToken
+        : "";
+    
+    const expiresIn = loginVerify?.data?.expiresIn || 0; // ExpiresIn is in milliseconds
+
+    // Convert expiresIn (milliseconds) to days
+    const expiresInDays = expiresIn / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+    Cookies.set("access_token", token, { expires: expiresInDays });
 
     // save user
-    localStorage.setItem("auth_user", JSON.stringify(authData?.user));
-
-    // save institute id
-    if (authData.instituteResponse !== undefined) {
-      localStorage.setItem(
-        "institute_id",
-        JSON.stringify(authData?.instituteResponse)
-      );
-    }
-
-    // save user roles
-    let roles = [];
-    authData?.roles?.forEach((item) => {
-      roles.push(item.roleName);
-    });
-    localStorage.setItem("auth_roles", JSON.stringify(roles));
+    localStorage.setItem("auth_user_public_address", JSON.stringify(loginVerify.data.address));
+    localStorage.setItem("expiresIn", JSON.stringify(loginVerify.data.expiresIn));
   }
 
   savePublicKey(publicKey) {
@@ -112,6 +106,11 @@ class AuthUserHelper {
       "challenegeMessage",
       JSON.stringify(challenegeMessage)
     );
+  }
+
+  getLoggedInUserAddress() {
+    const loggedInUserAddress = localStorage.getItem("auth_user_public_address") ? JSON.parse(localStorage.getItem("auth_user_public_address")) : [];
+    return loggedInUserAddress || {};
   }
 
   getPublicKey() {

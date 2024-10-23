@@ -7,14 +7,43 @@ import { AuthUser } from "../../../helpers/AuthUser";
 import { useDispatch, useSelector } from "react-redux";
 import { UrlBuilder } from "../../../helpers/UrlBuilder";
 import { callApi, clearState, selectApi } from "../../../reducers/apiSlice";
+import { Redirect } from "react-router-dom";
 
 const AccessAccount = () => {
-  const { loading, loginVerify } = useSelector(selectApi);
+  const { loginVerify = { data: {} } } = useSelector(selectApi);
   const dispatch = useDispatch();
   const history = useHistory();
 
-  console.log("Public", AuthUser.getPublicKey());
-  console.log("Private", AuthUser.getPrivateKey());
+  console.log("loginVerify", loginVerify);
+  // console.log("Public", AuthUser.getPublicKey());
+  // console.log("Private", AuthUser.getPrivateKey());
+
+  // if (loginVerify.data.accessToken !== undefined && loginVerify.data.accessToken !== null) {
+  //   AuthUser.saveLoginData(loginVerify);
+  //   return <Redirect to="/user-account" />;
+  // }
+
+  useEffect(() => {
+    // Clear previous loginVerify state only when status is 'success'
+    if (loginVerify?.status === "success") {
+      AuthUser.saveLoginData(loginVerify);
+
+      // Reset loginVerify state after a successful login
+      dispatch(
+        clearState({
+          output: "loginVerify",
+        })
+      );
+    }
+  }, [loginVerify?.status, dispatch]); // Only re-run the effect when loginVerify.status changes
+
+  console.log("loginVerify", loginVerify);
+  // Safely check if accessToken exists before redirecting
+  if (loginVerify?.data?.accessToken) {
+    return <Redirect to="/user-account" />;
+  }
+
+  console.log("loginVerify", loginVerify);
 
   const handleSignChallengeMessage = async () => {
     let privateKey = AuthUser.getPrivateKey();
@@ -32,14 +61,8 @@ const AccessAccount = () => {
     const web3 = new Web3();
 
     try {
-      // Add Ethereum prefix to the message
-      // const prefix = \x19Ethereum Signed Message:\n${challengeMessage.length}${challengeMessage};
-
-      // const messageHash = web3.utils.sha3(prefix);
-
       // Sign the message hash
       const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
-      // const signature = web3.eth.accounts.sign(challengeMessage, privateKey);
       console.log("Signature:", signature);
       console.log(
         "Public Key (Recovered from Signature):",
@@ -64,19 +87,34 @@ const AccessAccount = () => {
     }
   };
 
-  useEffect(() => {
-    if (loginVerify?.status === "success") {
-      history.push("/user-account");
-    }
-  }, [history, loginVerify?.status]);
+  // useEffect(() => {
+  //   if (loginVerify.data.accessToken !== undefined && loginVerify.data.accessToken !== null) {
+  //     AuthUser.saveLoginData(loginVerify);
+  //     // return <Redirect to="/user-account" />;
+  //     history.push("/user-account");
+  //   }
+  // }, [history, loginVerify?.status]);
 
-  useEffect(() => {
-    dispatch(
-      clearState({
-        output: "loginVerify",
-      })
-    );
-  }, [loginVerify?.status, dispatch]);
+  // if (loginVerify.data.accessToken !== undefined && loginVerify.data.accessToken !== null) {
+  //   AuthUser.saveLoginData(loginVerify);
+  //   return <Redirect to="/user-account" />;
+  // }
+
+  // useEffect(() => {
+  //   if (loginVerify?.status === "success" ) {
+
+  //     history.push("/user-account");
+  //   }
+  // }, [history, loginVerify?.status]);
+
+  // useEffect(() => {
+  //   if(loginVerify.status === "success")
+  //   dispatch(
+  //     clearState({
+  //       output: "loginVerify",
+  //     })
+  //   );
+  // });
 
   return (
     <>
