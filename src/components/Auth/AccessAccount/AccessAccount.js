@@ -101,13 +101,6 @@ const AccessAccount = () => {
   // }
 
   // useEffect(() => {
-  //   if (loginVerify?.status === "success" ) {
-
-  //     history.push("/user-account");
-  //   }
-  // }, [history, loginVerify?.status]);
-
-  // useEffect(() => {
   //   if(loginVerify.status === "success")
   //   dispatch(
   //     clearState({
@@ -125,27 +118,31 @@ const AccessAccount = () => {
             src={ArisPayLogo}
             className="mx-auto h-28 w-auto"
           />
-          <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            ARISPAY Crypto Wallet
+          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-300">
+            ARISPAY CRYPTO WALLET
           </h2>
-          <p className="mt-6 text-center text-lg font-normal leading-2 tracking-tight text-gray-600">
-            The decentralized web awaits!
+          <h2 className="mt-8 text-center text-3xl font-bold leading-9 tracking-tight text-blue-500">
+            Wallet Verification
+          </h2>
+          <p className="mt-2 text-center text-md font-normal leading-2 tracking-tight text-gray-600">
+            Unlock your account with challenge message verification!
           </p>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-          <div className="bg-white px-6 py-12 shadow-md sm:rounded-lg sm:px-12">
+        <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white px-6 py-12 shadow-2xl shadow-blue-600 sm:rounded-lg sm:px-12">
             <div className="space-y-6">
               <div>
-                <div className="flex w-full justify-center rounded-md bg-yellow-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600 text-center">
-                  Challenge Message : {AuthUser.getChallengeMessage()}
+                <div className="flex w-full justify-center rounded-md bg-purple-500 px-3 py-1.5 text-md font-normal font-mono leading-6 text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 text-center">
+                  Challenge Message: <br />
+                  {AuthUser.getChallengeMessage()}
                 </div>
                 <button
                   onClick={() => handleSignChallengeMessage()}
                   type="button"
-                  className="mt-8 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="mt-8 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-md font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  Click here to Sign the challenge Message
+                  Sign Challenge Message
                 </button>
               </div>
             </div>

@@ -81,7 +81,7 @@ class AuthUserHelper {
       JSON.parse(JSON.stringify(loginVerify)).data.accessToken !== undefined
         ? JSON.parse(JSON.stringify(loginVerify)).data.accessToken
         : "";
-    
+
     const expiresIn = loginVerify?.data?.expiresIn || 0; // ExpiresIn is in milliseconds
 
     // Convert expiresIn (milliseconds) to days
@@ -89,8 +89,14 @@ class AuthUserHelper {
     Cookies.set("access_token", token, { expires: expiresInDays });
 
     // save user
-    localStorage.setItem("auth_user_public_address", JSON.stringify(loginVerify.data.address));
-    localStorage.setItem("expiresIn", JSON.stringify(loginVerify.data.expiresIn));
+    localStorage.setItem(
+      "auth_user_public_address",
+      JSON.stringify(loginVerify.data.address)
+    );
+    localStorage.setItem(
+      "expiresIn",
+      JSON.stringify(loginVerify.data.expiresIn)
+    );
   }
 
   savePublicKey(publicKey) {
@@ -109,7 +115,9 @@ class AuthUserHelper {
   }
 
   getLoggedInUserAddress() {
-    const loggedInUserAddress = localStorage.getItem("auth_user_public_address") ? JSON.parse(localStorage.getItem("auth_user_public_address")) : [];
+    const loggedInUserAddress = localStorage.getItem("auth_user_public_address")
+      ? JSON.parse(localStorage.getItem("auth_user_public_address"))
+      : [];
     return loggedInUserAddress || {};
   }
 
@@ -138,8 +146,8 @@ class AuthUserHelper {
 
   removeLoginData() {
     Cookies.set("access_token", "");
-    localStorage.setItem("publicKey", "");
-    localStorage.setItem("privateKey", "");
+    // localStorage.setItem("publicKey", "");
+    // localStorage.setItem("privateKey", "");
     localStorage.setItem("challenegeMessage", "");
     // localStorage.setItem("auth_user_institute", "");
   }
