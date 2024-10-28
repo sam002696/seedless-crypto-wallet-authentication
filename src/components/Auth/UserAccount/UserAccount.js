@@ -107,10 +107,11 @@ const UserAccount = () => {
             ARISPAY CRYPTO WALLET
           </h2>
           <h2 className="mt-8 text-center text-3xl font-bold leading-9 tracking-tight text-blue-500">
-            Arispay Account
+            Welcome To Your Account
           </h2>
           <p className="mt-2 text-center text-md font-normal leading-2 tracking-tight text-gray-600">
-            Manage your everything in ARISPAY wallet!
+            Accessed account successfully. Manage your everything in ARISPAY
+            wallet!
           </p>
         </div>
 
