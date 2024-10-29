@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import WalletToken from "./WalletToken";
+import WalletNFT from "./WalletNFT";
 
 const WalletActivity = () => {
   const walletActivityInfo = ["Tokens", "NFTs", "Activity"];
@@ -10,12 +11,7 @@ const WalletActivity = () => {
       case "Tokens":
         return <WalletToken />;
       case "NFTs":
-      // return (
-      //   <EmptyList
-      //     text={`You don't have any order yet`}
-      //     detailedText={`You don't have any completed orders at this time`}
-      //   />
-      // );
+        return <WalletNFT />;
       case "Activity":
 
       default:
