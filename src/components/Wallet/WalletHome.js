@@ -3,8 +3,11 @@ import WalletInfo from "./WalletInfo/WalletInfo";
 import WalletTransaction from "./WalletTransaction/WalletTransaction";
 import WalletActivity from "./WalletActivity/WalletActivity";
 import ArisPayLogo from "../../images/logo/arispay_logo.png";
+import SingleToken from "./WalletActivity/WalletToken/SIngleToken/SingleToken";
+import { useTokenView } from "../../context/TokenViewContext";
 
 const WalletHome = () => {
+  const { isTokenView } = useTokenView();
   return (
     <>
       <div className="bg-gray-100">
@@ -17,8 +20,14 @@ const WalletHome = () => {
         <div className=" min-h-screen flex items-center justify-center">
           <div className="bg-white w-full max-w-5xl shadow-lg">
             <WalletInfo />
-            <WalletTransaction />
-            <WalletActivity />
+            {isTokenView ? (
+              <SingleToken />
+            ) : (
+              <>
+                <WalletTransaction />
+                <WalletActivity />
+              </>
+            )}
           </div>
         </div>
       </div>

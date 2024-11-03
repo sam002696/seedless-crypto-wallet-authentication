@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import WalletToken from "./WalletToken";
+
 import WalletNFT from "./WalletNFT";
+import WalletToken from "./WalletToken/WalletToken";
 
 const WalletActivity = () => {
   const walletActivityInfo = ["Tokens", "NFTs", "Activity"];
@@ -14,6 +15,7 @@ const WalletActivity = () => {
         return <WalletNFT />;
       case "Activity":
 
+      // eslint-disable-next-line no-fallthrough
       default:
         return null;
     }
