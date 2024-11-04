@@ -51,13 +51,6 @@ class AuthUserHelper {
     return institute?.eiinNo || null;
   }
 
-  // getUserInstitute() {
-  //   const instituteResponse = JSON.parse(
-  //     localStorage.getItem("auth_user_institute")
-  //   );
-  //   return instituteResponse.instituteName || "";
-  // }
-
   getRoles() {
     const roles = localStorage?.getItem("auth_roles")
       ? JSON.parse(localStorage?.getItem("auth_roles"))
@@ -146,10 +139,7 @@ class AuthUserHelper {
 
   removeLoginData() {
     Cookies.set("access_token", "");
-    // localStorage.setItem("publicKey", "");
-    // localStorage.setItem("privateKey", "");
     localStorage.setItem("challenegeMessage", "");
-    // localStorage.setItem("auth_user_institute", "");
   }
 }
 
