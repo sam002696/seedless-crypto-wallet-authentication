@@ -1,0 +1,53 @@
+import Web3 from "web3";
+import { AuthUser } from "../helpers/AuthUser";
+import { getNetworkName } from "../utilities/getNetworkName";
+
+const networkFetcher = async (operationId, parameters = {}) => {
+  console.log("parameters", parameters);
+  console.log("operationId", operationId);
+
+  try {
+    const { rpcUrl } = parameters;
+
+    // Initialize Web3 with the dynamic RPC URL
+    const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+    console.log("web3", web3);
+
+    // Use AuthUser to get the public address
+    const publicAddress = AuthUser.getPublicKey();
+    console.log("publicAddress", publicAddress);
+
+    switch (operationId) {
+      case "getAccountInfo": {
+        if (!publicAddress) throw new Error("No public address found.");
+
+        const balanceWei = await web3.eth.getBalance(publicAddress);
+        const balance = web3.utils.fromWei(balanceWei, "ether");
+
+        console.log("balance", balance);
+
+        return { account: publicAddress, balance };
+      }
+
+      case "getNetworkInfo": {
+        const networkId = await web3.eth.net.getId(); // Fetches network ID
+        const chainId = await web3.eth.getChainId(); // Fetches chain ID
+        const name = await getNetworkName(web3);
+
+        console.log("networkId", networkId);
+        console.log("chainId", chainId);
+        console.log("networkName", name);
+
+        return { networkId, chainId, name };
+      }
+
+      default:
+        throw new Error(`Unknown operationId: ${operationId}`);
+    }
+  } catch (error) {
+    console.error("Blockchain fetcher error:", error);
+    throw error;
+  }
+};
+
+export default networkFetcher;

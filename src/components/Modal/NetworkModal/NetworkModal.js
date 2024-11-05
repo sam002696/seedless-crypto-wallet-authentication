@@ -5,18 +5,20 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { loadNetwork, selectNetwork } from "../../../reducers/networkSlice";
 
 const rpcNetworks = [
   {
     hex: "0x1",
     name: "Ethereum Mainnet",
-    rpcUrl: "https://mainnet.infura.io/v3/d84fc50e49134ca289a38ab0bd749e59",
+    rpcUrl: "https://mainnet.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9",
     ticker: "ETH",
   },
   {
     hex: "0xaa36a7",
     name: "Ethereum Sepolia",
-    rpcUrl: "https://sepolia.infura.io/v3/d84fc50e49134ca289a38ab0bd749e59",
+    rpcUrl: "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9",
     ticker: "SepoliaETH",
   },
 ];
@@ -27,10 +29,16 @@ const NetworkModal = ({
   selectedNetwork,
   setSelectedNetwork,
 }) => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
+  const dispatch = useDispatch();
+
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network); // Update selected network
     setOpen(false); // Close the modal
+    dispatch(loadNetwork({ rpcUrl: network.rpcUrl }));
   };
+
+  console.log("selectedNetworkInfo", selectedNetworkInfo);
 
   return (
     <Dialog

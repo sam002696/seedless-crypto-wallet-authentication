@@ -4,6 +4,7 @@ import sagas from "../sagas";
 import ApiReducer from "./apiSlice";
 import ToastAlertReducer from "./toastAlertSlice";
 import ErrorMessageReducer from "./errorMessageSlice";
+import NetworkReducer from "./networkSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -12,6 +13,7 @@ export default configureStore({
     api: ApiReducer,
     toastAlert: ToastAlertReducer,
     errorMessage: ErrorMessageReducer,
+    network: NetworkReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

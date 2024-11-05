@@ -1,14 +1,22 @@
-import { call, put, takeEvery } from "redux-saga/effects";
+import { call, put, takeEvery, all } from "redux-saga/effects";
 import { failed, succeed } from "../reducers/apiSlice";
 import fetcher from "../lib/fetcher";
 import { AuthUser } from "../helpers/AuthUser";
 import { setToastAlert } from "../reducers/toastAlertSlice";
 import { setErrorMessage } from "../reducers/errorMessageSlice";
+import {
+  loadNetworkFailure,
+  loadNetworkSuccess,
+} from "../reducers/networkSlice";
+import networkFetcher from "../lib/networkFetcher";
 
 export default function* sagas() {
-  yield takeEvery(({ payload: { operationId = null } }) => {
-    return typeof operationId === "string" && operationId.length > 0;
-  }, performApiAction);
+  yield all([
+    takeEvery(({ payload: { operationId = null } }) => {
+      return typeof operationId === "string" && operationId.length > 0;
+    }, performApiAction),
+    takeEvery("network/loadNetwork", handleLoadNetwork),
+  ]);
 }
 
 function* performApiAction(action) {
@@ -57,6 +65,24 @@ function* performApiAction(action) {
               message: "Api call failed or check your internet connection",
             },
       })
+    );
+  }
+}
+
+function* handleLoadNetwork(action) {
+  const { rpcUrl } = action.payload;
+  try {
+    const accountData = yield call(networkFetcher, "getAccountInfo", {
+      rpcUrl,
+    });
+    const networkData = yield call(networkFetcher, "getNetworkInfo", {
+      rpcUrl,
+    });
+
+    yield put(loadNetworkSuccess({ ...accountData, ...networkData }));
+  } catch (error) {
+    yield put(
+      loadNetworkFailure({ error: error.message || "Failed to load network" })
     );
   }
 }
