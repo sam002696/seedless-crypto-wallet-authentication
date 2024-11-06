@@ -7,6 +7,7 @@ import {
 } from "@headlessui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadNetwork, selectNetwork } from "../../../reducers/networkSlice";
+import { Network } from "../../../helpers/Network";
 
 const rpcNetworks = [
   {
@@ -35,6 +36,7 @@ const NetworkModal = ({
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network); // Update selected network
     setOpen(false); // Close the modal
+    Network.saveNetwork(network);
     dispatch(loadNetwork({ rpcUrl: network.rpcUrl }));
   };
 

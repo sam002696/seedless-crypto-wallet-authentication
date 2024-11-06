@@ -17,6 +17,8 @@ const networkFetcher = async (operationId, parameters = {}) => {
     const publicAddress = AuthUser.getPublicKey();
     console.log("publicAddress", publicAddress);
 
+    // based on operation id
+    // we will get two cases and return the values
     switch (operationId) {
       case "getAccountInfo": {
         if (!publicAddress) throw new Error("No public address found.");
@@ -34,11 +36,14 @@ const networkFetcher = async (operationId, parameters = {}) => {
         const chainId = await web3.eth.getChainId(); // Fetches chain ID
         const name = await getNetworkName(web3);
 
+        const hex = "0x" + chainId.toString(16);
+
         console.log("networkId", networkId);
         console.log("chainId", chainId);
         console.log("networkName", name);
+        console.log("hex", hex);
 
-        return { networkId, chainId, name };
+        return { networkId, chainId, name, hex };
       }
 
       default:

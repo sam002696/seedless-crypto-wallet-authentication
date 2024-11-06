@@ -25,7 +25,7 @@ export const networkSlice = createSlice({
     loadNetworkSuccess: (state, { payload }) => {
       state.selectedNetwork = {
         ...state.selectedNetwork,
-        ...payload, // Updates account, balance, networkId, chainId, etc.
+        ...payload,
       };
       state.loading = false;
     },
