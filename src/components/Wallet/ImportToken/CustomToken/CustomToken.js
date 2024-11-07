@@ -1,33 +1,65 @@
-import React from "react";
+/* eslint-disable no-undef */
+import React, { useState, useEffect } from "react";
+import Web3 from "web3";
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import { AuthUser } from "../../../../helpers/AuthUser";
+import FetchTokenBalanceImport from "./FetchTokenBalanceImport";
+import FetchTokenSymbolNext from "./FetchTokenSymbolNext";
 
-const CustomToken = () => {
+const CustomToken = ({ setOpen }) => {
+  const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenSymbol, setTokenSymbol] = useState(null);
+  const [tokenDecimals, setTokenDecimals] = useState(null);
+  const [tokenBalance, setTokenBalance] = useState(null); // New state for token balance
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [isNextButtonClicked, setIsNextButtonClicked] = useState(false);
+
+  console.log("tokenDecimals", tokenDecimals);
+  console.log("tokenBalance", tokenBalance);
+
   return (
     <>
-      <div>
-        <label
-          htmlFor="token_contract_address"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Token contract address
-        </label>
-        <div className="mt-2">
-          <input
-            id="token_contract_address"
-            name="token_contract_address"
-            type="text"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+      {isNextButtonClicked ? (
+        <>
+          <FetchTokenBalanceImport
+            tokenAddress={tokenAddress}
+            setTokenAddress={setTokenAddress}
+            tokenSymbol={tokenSymbol}
+            setTokenSymbol={setTokenSymbol}
+            tokenDecimals={tokenDecimals}
+            setTokenDecimals={setTokenDecimals}
+            tokenBalance={tokenBalance}
+            setTokenBalance={setTokenBalance}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            isButtonEnabled={isButtonEnabled}
+            setIsButtonEnabled={setIsButtonEnabled}
+            isNextButtonClicked={isNextButtonClicked}
+            setIsNextButtonClicked={setIsNextButtonClicked}
+            setOpen={setOpen}
           />
-
-          <div className="text-center bg-blue-50 mt-20 py-2 rounded-full ">
-            <button
-              type="button"
-              className="text-lg font-medium text-blue-600 shadow-sm hover:bg-blue-100"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <FetchTokenSymbolNext
+            tokenAddress={tokenAddress}
+            setTokenAddress={setTokenAddress}
+            tokenSymbol={tokenSymbol}
+            setTokenSymbol={setTokenSymbol}
+            tokenDecimals={tokenDecimals}
+            setTokenDecimals={setTokenDecimals}
+            tokenBalance={tokenBalance}
+            setTokenBalance={setTokenBalance}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            isButtonEnabled={isButtonEnabled}
+            setIsButtonEnabled={setIsButtonEnabled}
+            isNextButtonClicked={isNextButtonClicked}
+            setIsNextButtonClicked={setIsNextButtonClicked}
+          />
+        </>
+      )}
     </>
   );
 };
