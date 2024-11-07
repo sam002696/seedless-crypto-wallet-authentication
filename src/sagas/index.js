@@ -70,13 +70,14 @@ function* performApiAction(action) {
 }
 
 function* handleLoadNetwork(action) {
-  const { rpcUrl } = action.payload;
+  const { rpcUrl, ticker } = action.payload;
   try {
     const accountData = yield call(networkFetcher, "getAccountInfo", {
       rpcUrl,
     });
     const networkData = yield call(networkFetcher, "getNetworkInfo", {
       rpcUrl,
+      ticker,
     });
 
     yield put(loadNetworkSuccess({ ...accountData, ...networkData }));

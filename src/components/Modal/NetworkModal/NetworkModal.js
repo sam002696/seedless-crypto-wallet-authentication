@@ -22,6 +22,20 @@ const rpcNetworks = [
     rpcUrl: "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9",
     ticker: "SepoliaETH",
   },
+  {
+    hex: "0x1234",
+    name: "Linea Mainnet",
+    rpcUrl:
+      "https://linea-mainnet.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9",
+    ticker: "LineaETH",
+  },
+  {
+    hex: "0x5678",
+    name: "Linea Sepolia",
+    rpcUrl:
+      "https://linea-sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9",
+    ticker: "LineaSepoliaETH",
+  },
 ];
 
 const NetworkModal = ({
@@ -34,10 +48,10 @@ const NetworkModal = ({
   const dispatch = useDispatch();
 
   const handleNetworkSelect = (network) => {
-    setSelectedNetwork(network); // Update selected network
-    setOpen(false); // Close the modal
+    setSelectedNetwork(network);
+    setOpen(false);
     Network.saveNetwork(network);
-    dispatch(loadNetwork({ rpcUrl: network.rpcUrl }));
+    dispatch(loadNetwork({ rpcUrl: network.rpcUrl, ticker: network.ticker }));
   };
 
   console.log("selectedNetworkInfo", selectedNetworkInfo);

@@ -7,7 +7,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
   console.log("operationId", operationId);
 
   try {
-    const { rpcUrl } = parameters;
+    const { rpcUrl, ticker } = parameters;
 
     // Initialize Web3 with the dynamic RPC URL
     const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
@@ -43,7 +43,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
         console.log("networkName", name);
         console.log("hex", hex);
 
-        return { networkId, chainId, name, hex };
+        return { networkId, chainId, name, hex, ticker };
       }
 
       default:

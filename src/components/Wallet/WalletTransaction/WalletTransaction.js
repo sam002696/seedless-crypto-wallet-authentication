@@ -1,11 +1,20 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import { selectNetwork } from "../../../reducers/networkSlice";
 
 const WalletTransaction = () => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
+
+  const currency =
+    selectedNetworkInfo.name === "Ethereum Sepolia" ? "SepoliaETH" : "ETH";
+
   return (
     <>
       <div className="py-4 text-center">
         <div className="flex flex-col space-y-2 ">
-          <p className="text-2xl font-medium">0 ETH</p>
+          <p className="text-2xl font-medium">
+            {selectedNetworkInfo.balance} {currency}
+          </p>
           <p>$0.00 USD Portfolio</p>
           <p>+$0.00 (+0.00%)</p>
         </div>

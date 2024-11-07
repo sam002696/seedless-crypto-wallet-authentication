@@ -1,4 +1,3 @@
-// Mapping of chain IDs to network names
 const NETWORK_NAMES = {
   1: "Ethereum Mainnet",
   3: "Ropsten Testnet",
@@ -8,8 +7,7 @@ const NETWORK_NAMES = {
   56: "Binance Smart Chain",
   137: "Polygon Mainnet",
   80001: "Polygon Mumbai Testnet",
-  11155111: "Sepolia Testnet",
-  // Add other chain IDs as needed
+  11155111: "Ethereum Sepolia",
 };
 
 export const getNetworkName = async (web3) => {
