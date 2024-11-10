@@ -56,6 +56,8 @@ const NetworkModal = ({
 
   console.log("selectedNetworkInfo", selectedNetworkInfo);
 
+  console.log("Network", Network.getNetworkRpcUrl());
+
   return (
     <Dialog
       open={open}

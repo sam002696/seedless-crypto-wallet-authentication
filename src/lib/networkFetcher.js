@@ -44,7 +44,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
         console.log("networkName", name);
         console.log("hex", hex);
 
-        return { networkId, chainId, name, hex, ticker };
+        return { networkId, chainId, name, hex, ticker, rpcUrl };
       }
 
       default:

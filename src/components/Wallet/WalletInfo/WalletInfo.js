@@ -22,9 +22,7 @@ const WalletInfo = () => {
   useEffect(() => {
     dispatch(
       loadNetwork({
-        rpcUrl:
-          Network.getNetworkRpcUrl() ||
-          process.env.REACT_APP_ETH_MAINNET_RPC_URL,
+        rpcUrl: Network.getNetworkRpcUrl(),
         ticker: Network.getNetworkTicker(),
       })
     );
