@@ -1,8 +1,5 @@
 /* eslint-disable no-undef */
-import React, { useState, useEffect } from "react";
-import Web3 from "web3";
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
-import { AuthUser } from "../../../../helpers/AuthUser";
+import React, { useState } from "react";
 import FetchTokenBalanceImport from "./FetchTokenBalanceImport";
 import FetchTokenSymbolNext from "./FetchTokenSymbolNext";
 
@@ -24,18 +21,11 @@ const CustomToken = ({ setOpen }) => {
         <>
           <FetchTokenBalanceImport
             tokenAddress={tokenAddress}
-            setTokenAddress={setTokenAddress}
             tokenSymbol={tokenSymbol}
-            setTokenSymbol={setTokenSymbol}
             tokenDecimals={tokenDecimals}
-            setTokenDecimals={setTokenDecimals}
             tokenBalance={tokenBalance}
             setTokenBalance={setTokenBalance}
-            errorMessage={errorMessage}
             setErrorMessage={setErrorMessage}
-            isButtonEnabled={isButtonEnabled}
-            setIsButtonEnabled={setIsButtonEnabled}
-            isNextButtonClicked={isNextButtonClicked}
             setIsNextButtonClicked={setIsNextButtonClicked}
             setOpen={setOpen}
           />
@@ -49,13 +39,11 @@ const CustomToken = ({ setOpen }) => {
             setTokenSymbol={setTokenSymbol}
             tokenDecimals={tokenDecimals}
             setTokenDecimals={setTokenDecimals}
-            tokenBalance={tokenBalance}
             setTokenBalance={setTokenBalance}
             errorMessage={errorMessage}
             setErrorMessage={setErrorMessage}
             isButtonEnabled={isButtonEnabled}
             setIsButtonEnabled={setIsButtonEnabled}
-            isNextButtonClicked={isNextButtonClicked}
             setIsNextButtonClicked={setIsNextButtonClicked}
           />
         </>
