@@ -2,6 +2,8 @@
 import React, { useEffect } from "react";
 import Web3 from "web3";
 import { AuthUser } from "../../../../helpers/AuthUser";
+import { useSelector } from "react-redux";
+import { selectNetwork } from "../../../../reducers/networkSlice";
 
 const FetchTokenSymbolNext = ({
   tokenAddress,
@@ -17,6 +19,10 @@ const FetchTokenSymbolNext = ({
   setIsButtonEnabled,
   setIsNextButtonClicked,
 }) => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
+
+  console.log("selectedNetworkInfo", selectedNetworkInfo);
+
   const handleAddressChange = (e) => {
     setTokenAddress(e.target.value);
     setTokenSymbol(null);
@@ -45,9 +51,11 @@ const FetchTokenSymbolNext = ({
       setErrorMessage(null);
 
       const web3 = new Web3(
-        Web3.givenProvider ||
-          "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
+        Web3.givenProvider || selectedNetworkInfo?.rpcUrl
+        // "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
       );
+
+      console.log("web3", web3);
 
       const symbolABI = [
         {
