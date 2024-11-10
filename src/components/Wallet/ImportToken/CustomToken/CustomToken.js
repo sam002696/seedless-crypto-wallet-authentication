@@ -7,6 +7,9 @@ const CustomToken = ({ setOpen }) => {
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState(null);
   const [tokenDecimals, setTokenDecimals] = useState(null);
+  const [tokenChainId, setTokenChainId] = useState(null);
+  const [tokenChainIdHex, setTokenChainIdHex] = useState(null);
+  const [tokenNetworkId, setTokenNetworkId] = useState(null);
   const [tokenBalance, setTokenBalance] = useState(null); // New state for token balance
   const [errorMessage, setErrorMessage] = useState(null);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -28,6 +31,12 @@ const CustomToken = ({ setOpen }) => {
             setErrorMessage={setErrorMessage}
             setIsNextButtonClicked={setIsNextButtonClicked}
             setOpen={setOpen}
+            tokenChainId={tokenChainId}
+            setTokenChainId={setTokenChainId}
+            tokenChainIdHex={tokenChainIdHex}
+            setTokenChainIdHex={setTokenChainIdHex}
+            tokenNetworkId={tokenNetworkId}
+            setTokenNetworkId={setTokenNetworkId}
           />
         </>
       ) : (
@@ -45,6 +54,12 @@ const CustomToken = ({ setOpen }) => {
             isButtonEnabled={isButtonEnabled}
             setIsButtonEnabled={setIsButtonEnabled}
             setIsNextButtonClicked={setIsNextButtonClicked}
+            tokenChainId={tokenChainId}
+            setTokenChainId={setTokenChainId}
+            tokenChainIdHex={tokenChainIdHex}
+            setTokenChainIdHex={setTokenChainIdHex}
+            tokenNetworkId={tokenNetworkId}
+            setTokenNetworkId={setTokenNetworkId}
           />
         </>
       )}

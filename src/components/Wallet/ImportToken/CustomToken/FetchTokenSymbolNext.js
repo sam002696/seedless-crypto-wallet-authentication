@@ -18,6 +18,9 @@ const FetchTokenSymbolNext = ({
   isButtonEnabled,
   setIsButtonEnabled,
   setIsNextButtonClicked,
+  setTokenChainId,
+  setTokenChainIdHex,
+  setTokenNetworkId,
 }) => {
   const selectedNetworkInfo = useSelector(selectNetwork);
 
@@ -29,6 +32,9 @@ const FetchTokenSymbolNext = ({
     setTokenDecimals(null);
     setErrorMessage(null);
     setTokenBalance(null);
+    setTokenChainId(null);
+    setTokenChainIdHex(null);
+    setTokenNetworkId(null);
   };
 
   useEffect(() => {
@@ -46,17 +52,66 @@ const FetchTokenSymbolNext = ({
     return () => clearTimeout(delayDebounce);
   }, [tokenAddress]);
 
+  // const fetchTokenDetails = async () => {
+  //   try {
+  //     setErrorMessage(null);
+
+  //     const web3 = new Web3(
+  //       Web3.givenProvider || selectedNetworkInfo?.rpcUrl
+  //       // "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
+  //     );
+
+  //     console.log("web3", web3);
+
+  //     const symbolABI = [
+  //       {
+  //         constant: true,
+  //         inputs: [],
+  //         name: "symbol",
+  //         outputs: [{ name: "", type: "string" }],
+  //         type: "function",
+  //       },
+  //     ];
+
+  //     const decimalsABI = [
+  //       {
+  //         constant: true,
+  //         inputs: [],
+  //         name: "decimals",
+  //         outputs: [{ name: "", type: "uint8" }],
+  //         type: "function",
+  //       },
+  //     ];
+
+  //     const symbolContract = new web3.eth.Contract(symbolABI, tokenAddress);
+  //     const symbol = await symbolContract.methods.symbol().call();
+
+  //     const decimalsContract = new web3.eth.Contract(decimalsABI, tokenAddress);
+  //     const decimals = await decimalsContract.methods.decimals().call();
+
+  //     setTokenSymbol(symbol);
+  //     setTokenDecimals(Number(decimals));
+  //     setIsButtonEnabled(true);
+  //     setErrorMessage(null);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setErrorMessage(
+  //       "Failed to fetch token details. Please ensure the token address is correct."
+  //     );
+  //     setIsButtonEnabled(false);
+  //   }
+  // };
+
   const fetchTokenDetails = async () => {
     try {
       setErrorMessage(null);
 
-      const web3 = new Web3(
-        Web3.givenProvider || selectedNetworkInfo?.rpcUrl
-        // "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
-      );
+      // Initialize web3 with given provider or fallback RPC URL
+      const web3 = new Web3(Web3.givenProvider || selectedNetworkInfo?.rpcUrl);
 
       console.log("web3", web3);
 
+      // ABI definitions for symbol and decimals
       const symbolABI = [
         {
           constant: true,
@@ -77,16 +132,35 @@ const FetchTokenSymbolNext = ({
         },
       ];
 
+      // Fetch token symbol and decimals
       const symbolContract = new web3.eth.Contract(symbolABI, tokenAddress);
       const symbol = await symbolContract.methods.symbol().call();
 
       const decimalsContract = new web3.eth.Contract(decimalsABI, tokenAddress);
       const decimals = await decimalsContract.methods.decimals().call();
 
+      // Get network information
+      const chainId = await web3.eth.getChainId(); // Chain ID
+      const networkId = await web3.eth.net.getId(); // Network ID
+
+      // Convert Chain ID to hex format
+      const chainIdHex = `0x${chainId.toString(16)}`;
+
+      // Update state with token and network details
       setTokenSymbol(symbol);
       setTokenDecimals(Number(decimals));
       setIsButtonEnabled(true);
       setErrorMessage(null);
+      setTokenChainId(Number(chainId));
+      setTokenChainIdHex(chainIdHex);
+      setTokenNetworkId(Number(networkId));
+
+      // Display network information
+      console.log("Network Details:", {
+        chainId,
+        chainIdHex,
+        networkId,
+      });
     } catch (error) {
       console.error(error);
       setErrorMessage(
@@ -95,15 +169,14 @@ const FetchTokenSymbolNext = ({
       setIsButtonEnabled(false);
     }
   };
-
   const renderImportTokenComponent = async () => {
     try {
       setIsNextButtonClicked(true);
 
       // Initialize web3
       const web3 = new Web3(
-        Web3.givenProvider ||
-          "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
+        Web3.givenProvider || selectedNetworkInfo?.rpcUrl
+        // "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9"
       );
 
       // Get the public address from local storage or your AuthUser helper

@@ -8,6 +8,9 @@ const FetchTokenBalanceImport = ({
   tokenSymbol,
   tokenDecimals,
   tokenBalance,
+  tokenChainId,
+  tokenChainIdHex,
+  tokenNetworkId,
   setTokenBalance,
   setErrorMessage,
   setIsNextButtonClicked,
@@ -28,6 +31,9 @@ const FetchTokenBalanceImport = ({
         tokenSymbol,
         tokenDecimals,
         tokenBalance,
+        tokenChainId,
+        tokenChainIdHex,
+        tokenNetworkId,
       };
 
       // Get existing TokenList from local storage or initialize an empty array
