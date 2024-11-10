@@ -16,6 +16,10 @@ class NetworkHelper {
     const network = JSON.parse(localStorage.getItem("networkName"));
     return network?.hex || null;
   }
+  getNetworkTicker() {
+    const network = JSON.parse(localStorage.getItem("networkName"));
+    return network?.ticker || null;
+  }
 }
 
 export const Network = new NetworkHelper();

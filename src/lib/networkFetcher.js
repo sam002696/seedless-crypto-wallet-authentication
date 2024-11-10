@@ -24,6 +24,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
         if (!publicAddress) throw new Error("No public address found.");
 
         const balanceWei = await web3.eth.getBalance(publicAddress);
+        console.log("balanceWei", balanceWei);
         const balance = web3.utils.fromWei(balanceWei, "ether");
 
         console.log("balance", balance);
@@ -43,7 +44,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
         console.log("networkName", name);
         console.log("hex", hex);
 
-        return { networkId, chainId, name, hex, ticker };
+        return { networkId, chainId, name, hex, ticker, rpcUrl };
       }
 
       default:

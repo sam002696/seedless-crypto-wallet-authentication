@@ -1,5 +1,7 @@
 import React from "react";
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import { useSelector } from "react-redux";
+import { selectNetwork } from "../../../../reducers/networkSlice";
 
 const FetchTokenBalanceImport = ({
   tokenAddress,
@@ -11,6 +13,8 @@ const FetchTokenBalanceImport = ({
   setIsNextButtonClicked,
   setOpen,
 }) => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
+
   const renderImportTokenBackComponent = () => {
     setIsNextButtonClicked(false);
     setTokenBalance(null); // Reset balance on back
@@ -54,6 +58,8 @@ const FetchTokenBalanceImport = ({
       setErrorMessage("Failed to save token to storage.");
     }
   };
+
+  console.log("selectedNetworkInfo", selectedNetworkInfo);
 
   return (
     <div>

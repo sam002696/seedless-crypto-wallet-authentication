@@ -9,6 +9,7 @@ const initialState = {
     balance: null,
     networkId: null,
     chainId: null,
+    token: [],
   },
   loading: false,
   error: null,
@@ -38,6 +39,9 @@ export const networkSlice = createSlice({
         ...state.selectedNetwork,
         ...payload.network,
       };
+    },
+    addToken: (state, { payload }) => {
+      state.selectedNetwork.token.push(payload);
     },
   },
 });

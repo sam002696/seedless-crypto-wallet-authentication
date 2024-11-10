@@ -71,6 +71,8 @@ function* performApiAction(action) {
 
 function* handleLoadNetwork(action) {
   const { rpcUrl, ticker } = action.payload;
+
+  console.log("rpcUrl", rpcUrl);
   try {
     const accountData = yield call(networkFetcher, "getAccountInfo", {
       rpcUrl,

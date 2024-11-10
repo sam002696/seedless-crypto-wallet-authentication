@@ -3,6 +3,7 @@ import NetworkModal from "../../Modal/NetworkModal/NetworkModal";
 import { useDispatch } from "react-redux";
 import { loadNetwork } from "../../../reducers/networkSlice";
 import { Network } from "../../../helpers/Network";
+import { AuthUser } from "../../../helpers/AuthUser";
 
 const WalletInfo = () => {
   const dispatch = useDispatch();
@@ -21,9 +22,8 @@ const WalletInfo = () => {
   useEffect(() => {
     dispatch(
       loadNetwork({
-        rpcUrl:
-          Network.getNetworkRpcUrl() ||
-          process.env.REACT_APP_ETH_MAINNET_RPC_URL,
+        rpcUrl: Network.getNetworkRpcUrl(),
+        ticker: Network.getNetworkTicker(),
       })
     );
   }, [dispatch]);
@@ -40,7 +40,7 @@ const WalletInfo = () => {
         <div className="flex flex-col space-y-1">
           <p className="font-medium text-sm">Account 1</p>
           <div className="bg-gray-100 px-3 py-1.5 rounded-md">
-            <p className="font-normal text-sm">0xfc3....D78BD</p>
+            <p className="font-normal text-sm">{AuthUser.getPublicKey()}</p>
           </div>
         </div>
         <div>...</div>
