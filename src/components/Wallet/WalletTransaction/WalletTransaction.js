@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectNetwork } from "../../../reducers/networkSlice";
+import SendCryptoTokenModal from "../../Modal/SendCryptoTokenModal/SendCryptoTokenModal";
 
 const WalletTransaction = () => {
   const selectedNetworkInfo = useSelector(selectNetwork);
+
+  const [openCryptoTokenSend, setOpenCryptoTokenSend] = useState(false);
+
+  const handleCryptoTokenSend = () => {
+    setOpenCryptoTokenSend(true);
+  };
 
   return (
     <>
@@ -37,6 +44,7 @@ const WalletTransaction = () => {
           </button>
           <button
             type="button"
+            onClick={() => handleCryptoTokenSend()}
             className="relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
           >
             Send
@@ -49,6 +57,12 @@ const WalletTransaction = () => {
           </button>
         </div>
       </div>
+      {/* Import Wallet */}
+
+      <SendCryptoTokenModal
+        setOpenCryptoTokenSend={setOpenCryptoTokenSend}
+        openCryptoTokenSend={openCryptoTokenSend}
+      />
     </>
   );
 };
