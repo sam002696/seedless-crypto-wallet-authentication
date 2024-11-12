@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import NetworkModal from "../../Modal/NetworkModal/NetworkModal";
 import { useDispatch } from "react-redux";
-import { loadNetwork } from "../../../reducers/networkSlice";
+import { addToken, loadNetwork } from "../../../reducers/networkSlice";
 import { Network } from "../../../helpers/Network";
 import { AuthUser } from "../../../helpers/AuthUser";
+import { Token } from "../../../helpers/Token";
 
 const WalletInfo = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,12 @@ const WalletInfo = () => {
       })
     );
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   dispatch(addToken(Token.getToken(), Network.getNetworkHex()));
+  // }, [dispatch]);
+
+  // console.log("Network", Network.getNetworkHex());
 
   return (
     <>

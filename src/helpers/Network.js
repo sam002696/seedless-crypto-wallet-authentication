@@ -20,6 +20,11 @@ class NetworkHelper {
     const network = JSON.parse(localStorage.getItem("networkName"));
     return network?.ticker || null;
   }
+  // getNetworkChainId() {
+  //   const network = JSON.parse(localStorage.getItem("networkName"));
+  //   console.log("network", network);
+  //   return network?.chainId || null;
+  // }
 }
 
 export const Network = new NetworkHelper();

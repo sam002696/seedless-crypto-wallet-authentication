@@ -2,6 +2,7 @@ import React from "react";
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
 import { selectNetwork } from "../../../../reducers/networkSlice";
+import { Token } from "../../../../helpers/Token";
 
 const FetchTokenBalanceImport = ({
   tokenAddress,
@@ -37,8 +38,7 @@ const FetchTokenBalanceImport = ({
       };
 
       // Get existing TokenList from local storage or initialize an empty array
-      const existingTokenList =
-        JSON.parse(localStorage.getItem("TokenList")) || [];
+      const existingTokenList = Token.getToken() || [];
 
       // Check if the token is already in the list by address to prevent duplicates
       const isTokenAlreadyAdded = existingTokenList.some(
@@ -50,7 +50,7 @@ const FetchTokenBalanceImport = ({
         existingTokenList.push(tokenData);
 
         // Save the updated array back to local storage
-        localStorage.setItem("TokenList", JSON.stringify(existingTokenList));
+        Token.saveToken(existingTokenList);
 
         // Optionally, reset the form or show a success message
         setErrorMessage(null); // Clear any previous errors

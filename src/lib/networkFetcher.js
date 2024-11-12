@@ -25,7 +25,7 @@ const networkFetcher = async (operationId, parameters = {}) => {
 
         const balanceWei = await web3.eth.getBalance(publicAddress);
         console.log("balanceWei", balanceWei);
-        const balance = web3.utils.fromWei(balanceWei, "ether");
+        const balance = Number(web3.utils.fromWei(balanceWei, "ether"));
 
         console.log("balance", balance);
 
@@ -33,8 +33,8 @@ const networkFetcher = async (operationId, parameters = {}) => {
       }
 
       case "getNetworkInfo": {
-        const networkId = await web3.eth.net.getId(); // Fetches network ID
-        const chainId = await web3.eth.getChainId(); // Fetches chain ID
+        const networkId = Number(await web3.eth.net.getId()); // Fetches network ID
+        const chainId = Number(await web3.eth.getChainId()); // Fetches chain ID
         const name = await getNetworkName(web3);
 
         const hex = "0x" + chainId.toString(16);
