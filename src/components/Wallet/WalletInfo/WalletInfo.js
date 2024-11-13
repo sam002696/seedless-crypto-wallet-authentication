@@ -18,22 +18,21 @@ const WalletInfo = () => {
     setOpen(true);
   };
 
-  console.log("selectedNetwork", selectedNetwork);
+  // console.log("selectedNetwork", selectedNetwork);
 
   useEffect(() => {
     dispatch(
       loadNetwork({
         rpcUrl: Network.getNetworkRpcUrl(),
         ticker: Network.getNetworkTicker(),
+        hex: Network.getNetworkHex(),
       })
     );
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   dispatch(addToken(Token.getToken(), Network.getNetworkHex()));
-  // }, [dispatch]);
-
-  // console.log("Network", Network.getNetworkHex());
+  useEffect(() => {
+    dispatch(addToken([Token.getToken(), Network.getNetworkHex()]));
+  }, [dispatch]);
 
   return (
     <>

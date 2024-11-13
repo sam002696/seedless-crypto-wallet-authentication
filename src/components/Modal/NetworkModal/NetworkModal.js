@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -6,8 +6,13 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { loadNetwork, selectNetwork } from "../../../reducers/networkSlice";
+import {
+  addToken,
+  loadNetwork,
+  // selectNetwork,
+} from "../../../reducers/networkSlice";
 import { Network } from "../../../helpers/Network";
+import { Token } from "../../../helpers/Token";
 
 const rpcNetworks = [
   {
@@ -44,19 +49,26 @@ const NetworkModal = ({
   selectedNetwork,
   setSelectedNetwork,
 }) => {
-  const selectedNetworkInfo = useSelector(selectNetwork);
+  // const selectedNetworkInfo = useSelector(selectNetwork);
   const dispatch = useDispatch();
 
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network);
     setOpen(false);
     Network.saveNetwork(network);
-    dispatch(loadNetwork({ rpcUrl: network.rpcUrl, ticker: network.ticker }));
+    dispatch(
+      loadNetwork({
+        rpcUrl: network.rpcUrl,
+        ticker: network.ticker,
+        hex: network.hex,
+      })
+    );
+    dispatch(addToken([Token.getToken(), Network.getNetworkHex()]));
   };
 
-  console.log("selectedNetworkInfo", selectedNetworkInfo);
+  // console.log("selectedNetworkInfo", selectedNetworkInfo);
 
-  console.log("Network", Network.getNetworkRpcUrl());
+  // console.log("Network", Network.getNetworkRpcUrl());
 
   return (
     <Dialog

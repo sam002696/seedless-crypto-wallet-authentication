@@ -3,19 +3,19 @@ import { AuthUser } from "../helpers/AuthUser";
 import { getNetworkName } from "../utilities/getNetworkName";
 
 const networkFetcher = async (operationId, parameters = {}) => {
-  console.log("parameters", parameters);
-  console.log("operationId", operationId);
+  // console.log("parameters", parameters);
+  // console.log("operationId", operationId);
 
   try {
-    const { rpcUrl, ticker } = parameters;
+    const { rpcUrl, ticker, hex } = parameters;
 
     // Initialize Web3 with the dynamic RPC URL
     const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
-    console.log("web3", web3);
+    // console.log("web3", web3);
 
     // Use AuthUser to get the public address
     const publicAddress = AuthUser.getPublicKey();
-    console.log("publicAddress", publicAddress);
+    // console.log("publicAddress", publicAddress);
 
     // based on operation id
     // we will get two cases and return the values
@@ -24,10 +24,10 @@ const networkFetcher = async (operationId, parameters = {}) => {
         if (!publicAddress) throw new Error("No public address found.");
 
         const balanceWei = await web3.eth.getBalance(publicAddress);
-        console.log("balanceWei", balanceWei);
+        // console.log("balanceWei", balanceWei);
         const balance = Number(web3.utils.fromWei(balanceWei, "ether"));
 
-        console.log("balance", balance);
+        // console.log("balance", balance);
 
         return { account: publicAddress, balance };
       }
@@ -37,12 +37,10 @@ const networkFetcher = async (operationId, parameters = {}) => {
         const chainId = Number(await web3.eth.getChainId()); // Fetches chain ID
         const name = await getNetworkName(web3);
 
-        const hex = "0x" + chainId.toString(16);
-
-        console.log("networkId", networkId);
-        console.log("chainId", chainId);
-        console.log("networkName", name);
-        console.log("hex", hex);
+        // console.log("networkId", networkId);
+        // console.log("chainId", chainId);
+        // console.log("networkName", name);
+        // console.log("hex", hex);
 
         return { networkId, chainId, name, hex, ticker, rpcUrl };
       }

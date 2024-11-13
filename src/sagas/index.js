@@ -70,9 +70,9 @@ function* performApiAction(action) {
 }
 
 function* handleLoadNetwork(action) {
-  const { rpcUrl, ticker } = action.payload;
+  const { rpcUrl, ticker, hex } = action.payload;
 
-  console.log("rpcUrl", rpcUrl);
+  // console.log("rpcUrl", rpcUrl);
   try {
     const accountData = yield call(networkFetcher, "getAccountInfo", {
       rpcUrl,
@@ -80,7 +80,10 @@ function* handleLoadNetwork(action) {
     const networkData = yield call(networkFetcher, "getNetworkInfo", {
       rpcUrl,
       ticker,
+      hex,
     });
+
+    // yield put(checkAndClearTokens(hex));
 
     yield put(loadNetworkSuccess({ ...accountData, ...networkData }));
   } catch (error) {
