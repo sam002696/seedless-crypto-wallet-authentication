@@ -14,11 +14,11 @@ const WalletHome = () => {
         <div className=" flex flex-row items-center justify-center">
           <img alt="ARISPAY Wallet" src={ArisPayLogo} className="h-20 w-20" />
           <h2 className="text-center text-xl font-bold leading-9 tracking-tight text-gray-600">
-            ARISPAY CRYPTO WALLET
+            ARISPAY WALLET
           </h2>
         </div>
         <div className=" min-h-screen flex items-center justify-center">
-          <div className="bg-white w-full max-w-5xl shadow-lg">
+          <div className="bg-white w-full max-w-4xl shadow-lg">
             <WalletInfo />
             {isTokenView ? (
               <SingleToken />
