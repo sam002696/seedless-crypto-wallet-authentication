@@ -1,4 +1,5 @@
 import React from "react";
+import Asset from "./Asset";
 
 const From = ({
   setIsOpen,
@@ -6,6 +7,7 @@ const From = ({
   userAccounts,
   setSelectedAccount,
   selectedAccount,
+  showAsset,
 }) => {
   const handleDropdownToggle = () => {
     setIsOpen(!isOpen);
@@ -82,6 +84,12 @@ const From = ({
               ))}
             </ul>
           </div>
+        )}
+
+        {showAsset && (
+          <>
+            <Asset />
+          </>
         )}
       </div>
     </>

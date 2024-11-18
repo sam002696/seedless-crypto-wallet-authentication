@@ -8,6 +8,7 @@ import store from "./reducers/store";
 import { Provider } from "react-redux";
 import { ToastAlert } from "./notification";
 import { TokenViewProvider } from "./context/TokenViewContext";
+import { AssetListProvider } from "./context/AssetListContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -15,8 +16,10 @@ root.render(
   <BrowserRouter>
     <Provider store={store}>
       <TokenViewProvider>
-        <ToastAlert />
-        <App />
+        <AssetListProvider>
+          <ToastAlert />
+          <App />
+        </AssetListProvider>
       </TokenViewProvider>
     </Provider>
   </BrowserRouter>
