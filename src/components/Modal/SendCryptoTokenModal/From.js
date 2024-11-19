@@ -88,7 +88,7 @@ const From = ({
 
         {showAsset && (
           <>
-            <Asset />
+            <Asset showDownIcon={true} makeAssetsDisable={false} />
           </>
         )}
       </div>

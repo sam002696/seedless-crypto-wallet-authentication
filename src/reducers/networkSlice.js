@@ -61,6 +61,19 @@ export const networkSlice = createSlice({
         }
       });
     },
+    updateTokenBalances: (state, { payload }) => {
+      const { balances } = payload;
+
+      balances.forEach(({ tokenAddress, balance }) => {
+        const token = state.selectedNetwork.token.find(
+          (token) => token.tokenAddress === tokenAddress
+        );
+
+        if (token) {
+          token.balance = balance;
+        }
+      });
+    },
   },
 });
 
@@ -71,6 +84,7 @@ export const {
   setSelectedNetwork,
   addToken,
   checkAndClearTokens,
+  updateTokenBalances,
 } = networkSlice.actions;
 
 export const selectNetwork = (state) => state.network.selectedNetwork;

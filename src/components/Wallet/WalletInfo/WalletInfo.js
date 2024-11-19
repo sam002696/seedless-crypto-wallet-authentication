@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
+import Web3 from "web3";
 import NetworkModal from "../../Modal/NetworkModal/NetworkModal";
-import { useDispatch } from "react-redux";
-import { addToken, loadNetwork } from "../../../reducers/networkSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToken,
+  loadNetwork,
+  selectNetwork,
+  updateTokenBalances,
+} from "../../../reducers/networkSlice";
 import { Network } from "../../../helpers/Network";
 import { AuthUser } from "../../../helpers/AuthUser";
 import { Token } from "../../../helpers/Token";
@@ -10,24 +16,24 @@ import {
   CheckCircleIcon,
   Bars3CenterLeftIcon,
 } from "@heroicons/react/24/solid";
+import { getTokenBalance } from "../../../utilities/getTokenBalance";
 
 const WalletInfo = () => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
   const dispatch = useDispatch();
-  const [open, setOpen] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState({
     name: Network.getNetworkName() || "Ethereum Mainnet",
     hex: Network.getNetworkHex() || "0x1",
   });
-
+  const [open, setOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [tooltipText, setTooltipText] = useState("Copy to Clipboard");
-  const userAddress = AuthUser?.getLoggedInUserAddress() || "0x000000"; // Default fallback
-
-  // Truncate address (first 7 and last 5 characters)
+  const userAddress = AuthUser?.getLoggedInUserAddress() || "0x000000";
   const truncatedAddress = `${userAddress.slice(0, 10)}...${userAddress.slice(
     -8
   )}`;
 
+  // to copy the public address
   const handleCopy = () => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       // Use the clipboard API if available
@@ -65,12 +71,12 @@ const WalletInfo = () => {
     }
   };
 
+  // opening the network list modal
   const handleNetwork = () => {
     setOpen(true);
   };
 
-  // console.log("selectedNetwork", selectedNetwork);
-
+  // preserving network related info when refreshed
   useEffect(() => {
     dispatch(
       loadNetwork({
@@ -81,9 +87,53 @@ const WalletInfo = () => {
     );
   }, [dispatch]);
 
+  // preserving token related info when refreshed
   useEffect(() => {
     dispatch(addToken([Token.getToken(), Network.getNetworkHex()]));
   }, [dispatch]);
+
+  // preserving and
+  // updating balances from web3
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchBalances = async () => {
+      try {
+        const web3 = new Web3(
+          Web3.givenProvider || selectedNetworkInfo?.rpcUrl
+        );
+        if (Array.isArray(selectedNetworkInfo?.token)) {
+          const balances = await Promise.all(
+            selectedNetworkInfo.token.map(async (token) => {
+              const balance = await getTokenBalance(
+                web3,
+                token?.tokenAddress,
+                AuthUser.getPublicKey(),
+                token?.tokenDecimals
+              );
+
+              return {
+                symbol: token.tokenSymbol,
+                balance,
+                tokenAddress: token.tokenAddress,
+              };
+            })
+          );
+          if (isMounted) {
+            dispatch(updateTokenBalances({ balances }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching token balances: ", error);
+      }
+    };
+
+    fetchBalances();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, selectedNetworkInfo]);
 
   return (
     <>

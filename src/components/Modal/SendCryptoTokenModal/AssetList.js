@@ -1,28 +1,51 @@
 import React from "react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import { useAssetList } from "../../../context/AssetListContext";
+import { useSelector } from "react-redux";
+import { selectNetwork } from "../../../reducers/networkSlice";
 
 const AssetList = () => {
-  const assets = [
-    { type: "native", name: "SepoliaETH", balance: "0.5321" },
-    { type: "token", name: "USDT", balance: "120.34" },
-    { type: "token", name: "DAI", balance: "98.12" },
-    { type: "token", name: "WBTC", balance: "0.0032" },
-  ];
+  const { setShowAssetList } = useAssetList();
+  const selectedNetworkInfo = useSelector(selectNetwork);
+
+  console.log("selectedNetworkInfo", selectedNetworkInfo);
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg shadow-sm mt-4">
-      <h2 className="text-xs font-semibold text-gray-900 mb-4">Tokens</h2>
+      <div className=" flex flex-row justify-between items-center my-4">
+        <h2 className="text-xs font-semibold text-gray-900 ">Tokens</h2>
+        <XMarkIcon
+          onClick={() => setShowAssetList(false)}
+          className=" size-4 cursor-pointer"
+        />
+      </div>
 
+      {/* Native balance */}
+
+      <div className="my-2.5">
+        <div className="flex justify-between items-center p-3 border rounded-md bg-white">
+          <span className="font-medium text-gray-700 text-xs">
+            {selectedNetworkInfo.ticker}
+          </span>
+          <span className="text-gray-900 font-semibold text-xs">
+            {selectedNetworkInfo.balance} {selectedNetworkInfo.ticker}
+          </span>
+        </div>
+      </div>
+
+      {/* Tokens list */}
       <ul className="space-y-2">
-        {assets.map((asset, index) => (
+        {selectedNetworkInfo?.token.map((asset, index) => (
           <li
             key={index}
             className="flex justify-between items-center p-3 border rounded-md bg-white"
           >
             <span className="font-medium text-gray-700 text-xs">
-              {asset.name}
+              {asset.tokenSymbol}
             </span>
             <span className="text-gray-900 font-semibold text-xs">
-              {asset.balance} {asset.type === "native" ? "ETH" : ""}
+              {asset.balance} {asset.tokenSymbol}
+              {/* {asset.type === "native" ? "ETH" : ""} */}
             </span>
           </li>
         ))}

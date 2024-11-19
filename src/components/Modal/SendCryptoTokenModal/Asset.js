@@ -1,9 +1,8 @@
 import React from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import AssetList from "./AssetList";
 import { useAssetList } from "../../../context/AssetListContext";
 
-const Asset = () => {
+const Asset = ({ showDownIcon, makeAssetsDisable }) => {
   const { setShowAssetList } = useAssetList();
 
   const handleAssetList = () => {
@@ -17,12 +16,17 @@ const Asset = () => {
           {/* Network Name */}
           <div className="flex flex-row justify-evenly items-center">
             <button
-              onClick={handleAssetList}
-              className="text-gray-900 font-medium text-xs"
+              disabled={makeAssetsDisable}
+              className="text-gray-900 font-medium text-xs disabled:cursor-not-allowed"
             >
               Network Name
             </button>
-            <ChevronDownIcon className="size-4 ml-1" />
+            {showDownIcon && (
+              <ChevronDownIcon
+                onClick={handleAssetList}
+                className="size-4 ml-1 cursor-pointer"
+              />
+            )}
           </div>
 
           {/* Input Field */}

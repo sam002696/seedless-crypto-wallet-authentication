@@ -79,7 +79,7 @@ const To = ({ setShowAsset, showAsset }) => {
       {!isValid && originalAddress && (
         <p className="mt-2 text-sm text-red-600">Invalid public address.</p>
       )}
-      {showAsset && <Asset />}
+      {showAsset && <Asset showDownIcon={false} makeAssetsDisable={true} />}
     </div>
   );
 };

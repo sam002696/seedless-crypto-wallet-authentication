@@ -5,11 +5,6 @@ export const getTokenBalance = async (
   publicAddress,
   tokenDecimals
 ) => {
-  console.log("web3", web3);
-  console.log("tokenAddress", tokenAddress);
-  console.log("publicAddress", publicAddress);
-  console.log("tokenDecimals", tokenDecimals);
-
   try {
     // ABI for balanceOf function
     const balanceABI = [
@@ -43,7 +38,7 @@ export const getTokenBalance = async (
 
     return formattedBalance;
   } catch (error) {
-    console.error("Error fetching token balance:", error);
+    // console.error("Error fetching token balance:", error);
     return null;
   }
 };
