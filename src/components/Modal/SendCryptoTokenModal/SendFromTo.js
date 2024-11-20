@@ -41,6 +41,15 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAsset, setShowAsset] = useState(false);
 
+  const [assetInput, setAssetInput] = useState(() => {
+    return localStorage.getItem("assetInput") || "";
+  });
+
+  const updateAssetInput = (value) => {
+    setAssetInput(value);
+    localStorage.setItem("assetInput", value);
+  };
+
   return (
     <>
       <Dialog
@@ -78,11 +87,15 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
                             setSelectedAccount={setSelectedAccount}
                             selectedAccount={selectedAccount}
                             showAsset={showAsset}
+                            assetInput={assetInput}
+                            updateAssetInput={updateAssetInput}
                           />
 
                           <To
                             setShowAsset={setShowAsset}
                             showAsset={showAsset}
+                            assetInput={assetInput}
+                            updateAssetInput={updateAssetInput}
                           />
                         </div>
                       </div>

@@ -8,7 +8,11 @@ const From = ({
   setSelectedAccount,
   selectedAccount,
   showAsset,
+  assetInput,
+  updateAssetInput,
 }) => {
+  // const [showBalance, setShowBalance] = useState();
+
   const handleDropdownToggle = () => {
     setIsOpen(!isOpen);
   };
@@ -88,7 +92,12 @@ const From = ({
 
         {showAsset && (
           <>
-            <Asset showDownIcon={true} makeAssetsDisable={false} />
+            <Asset
+              assetInput={assetInput}
+              updateAssetInput={updateAssetInput}
+              showDownIcon={true}
+              makeAssetsDisable={false}
+            />
           </>
         )}
       </div>

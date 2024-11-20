@@ -3,12 +3,44 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useAssetList } from "../../../context/AssetListContext";
 import { useSelector } from "react-redux";
 import { selectNetwork } from "../../../reducers/networkSlice";
+import { useAsset } from "../../../context/AssetContext";
 
 const AssetList = () => {
   const { setShowAssetList } = useAssetList();
   const selectedNetworkInfo = useSelector(selectNetwork);
+  const { selectedAsset, selectAsset } = useAsset();
 
   console.log("selectedNetworkInfo", selectedNetworkInfo);
+
+  const handleTokenAsset = (asset) => {
+    const defaultAsset = {
+      balance: asset.balance,
+      tokenAddress: asset.tokenAddress,
+      tokenBalance: asset.tokenBalance,
+      tokenChainId: asset.tokenChainId,
+      tokenChainIdHex: asset.tokenChainIdHex,
+      tokenDecimals: asset.tokenDecimals,
+      tokenNetworkId: asset.tokenNetworkId,
+      tokenSymbol: asset.tokenSymbol,
+    };
+    selectAsset(defaultAsset);
+    setShowAssetList(false);
+  };
+
+  const handleNativeNetworkInfo = () => {
+    const defaultAsset = {
+      balance: selectedNetworkInfo.balance,
+      tokenAddress: selectedNetworkInfo.account,
+      tokenBalance: null,
+      tokenChainId: selectedNetworkInfo.chainId,
+      tokenChainIdHex: selectedNetworkInfo.hex,
+      tokenDecimals: null,
+      tokenNetworkId: selectedNetworkInfo.networkId,
+      tokenSymbol: selectedNetworkInfo.ticker,
+    };
+    selectAsset(defaultAsset);
+    setShowAssetList(false);
+  };
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg shadow-sm mt-4">
@@ -23,7 +55,14 @@ const AssetList = () => {
       {/* Native balance */}
 
       <div className="my-2.5">
-        <div className="flex justify-between items-center p-3 border rounded-md bg-white">
+        <div
+          onClick={handleNativeNetworkInfo}
+          className={`flex justify-between items-center p-3 border rounded-md  cursor-pointer ${
+            selectedAsset.tokenSymbol === selectedNetworkInfo.ticker
+              ? "bg-blue-300"
+              : "bg-white"
+          }`}
+        >
           <span className="font-medium text-gray-700 text-xs">
             {selectedNetworkInfo.ticker}
           </span>
@@ -36,9 +75,14 @@ const AssetList = () => {
       {/* Tokens list */}
       <ul className="space-y-2">
         {selectedNetworkInfo?.token.map((asset, index) => (
-          <li
+          <div
+            onClick={() => handleTokenAsset(asset)}
             key={index}
-            className="flex justify-between items-center p-3 border rounded-md bg-white"
+            className={`flex justify-between items-center p-3 border rounded-md cursor-pointer ${
+              selectedAsset.tokenSymbol === asset.tokenSymbol
+                ? "bg-blue-300"
+                : "bg-white"
+            }`}
           >
             <span className="font-medium text-gray-700 text-xs">
               {asset.tokenSymbol}
@@ -47,7 +91,7 @@ const AssetList = () => {
               {asset.balance} {asset.tokenSymbol}
               {/* {asset.type === "native" ? "ETH" : ""} */}
             </span>
-          </li>
+          </div>
         ))}
       </ul>
     </div>

@@ -9,18 +9,21 @@ import { Provider } from "react-redux";
 import { ToastAlert } from "./notification";
 import { TokenViewProvider } from "./context/TokenViewContext";
 import { AssetListProvider } from "./context/AssetListContext";
+import { AssetProvider } from "./context/AssetContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
   <BrowserRouter>
     <Provider store={store}>
-      <TokenViewProvider>
-        <AssetListProvider>
-          <ToastAlert />
-          <App />
-        </AssetListProvider>
-      </TokenViewProvider>
+      <AssetProvider>
+        <TokenViewProvider>
+          <AssetListProvider>
+            <ToastAlert />
+            <App />
+          </AssetListProvider>
+        </TokenViewProvider>
+      </AssetProvider>
     </Provider>
   </BrowserRouter>
 

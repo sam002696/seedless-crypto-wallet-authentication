@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Asset from "./Asset";
 
-const To = ({ setShowAsset, showAsset }) => {
+const To = ({ setShowAsset, showAsset, assetInput, updateAssetInput }) => {
   const [originalAddress, setOriginalAddress] = useState("");
-  const [displayAddress, setDisplayAddress] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  const [displayAddress, setDisplayAddress] = useState(() => {
+    return localStorage.getItem("displayAddress") || "";
+  });
+  const [isValid, setIsValid] = useState(() => {
+    const storedValue = localStorage.getItem("isValid");
+    return storedValue ? JSON.parse(storedValue) : false;
+  });
 
   const validateAddress = (input) => {
     // Basic Ethereum address validation
@@ -18,30 +23,47 @@ const To = ({ setShowAsset, showAsset }) => {
     setOriginalAddress(inputValue);
 
     if (validateAddress(inputValue)) {
+      const truncatedAddress = `${inputValue.slice(0, 10)}...${inputValue.slice(
+        -8
+      )}`;
       setIsValid(true);
+      setDisplayAddress(truncatedAddress);
 
-      // this is for controlling the asset component - sami
+      // Save isValid and displayAddress to localStorage
+      localStorage.setItem("isValid", JSON.stringify(true));
+      localStorage.setItem("displayAddress", truncatedAddress);
+
+      // Control the Asset component
       setShowAsset(true);
-
-      setDisplayAddress(`${inputValue.slice(0, 10)}...${inputValue.slice(-8)}`); // Truncate if valid
     } else {
       setIsValid(false);
       setDisplayAddress(inputValue);
 
-      // this is for controlling the asset component - sami
+      // Remove isValid and displayAddress from localStorage
+      localStorage.removeItem("isValid");
+      localStorage.removeItem("displayAddress");
+
+      // Control the Asset component
       setShowAsset(false);
     }
   };
 
   const handleCancel = () => {
     setIsValid(false);
-    // setDisplayAddress(originalAddress);
+    setDisplayAddress("");
 
-    // this is for controlling the asset component - sami
+    // Remove isValid and displayAddress from localStorage
+    localStorage.removeItem("isValid");
+    localStorage.removeItem("displayAddress");
+
+    // Control the Asset component
     setShowAsset(false);
-
     setOriginalAddress("");
   };
+
+  useEffect(() => {
+    setShowAsset(isValid);
+  }, [isValid, setShowAsset]);
 
   return (
     <div className="col-span-full">
@@ -79,7 +101,14 @@ const To = ({ setShowAsset, showAsset }) => {
       {!isValid && originalAddress && (
         <p className="mt-2 text-sm text-red-600">Invalid public address.</p>
       )}
-      {showAsset && <Asset showDownIcon={false} makeAssetsDisable={true} />}
+      {showAsset && (
+        <Asset
+          showDownIcon={false}
+          makeAssetsDisable={true}
+          assetInput={assetInput}
+          updateAssetInput={updateAssetInput}
+        />
+      )}
     </div>
   );
 };
