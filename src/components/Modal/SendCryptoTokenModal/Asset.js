@@ -22,30 +22,22 @@ const Asset = ({
   };
 
   const handleChange = (e) => {
-    // to make changes in parent component
-    // (e.g. SendFromTo.js)
-    updateAssetInput(e.target.value);
+    const inputValue = e.target.value;
 
-    // this checks if
-    // input value is greater than asset's balance and
-    // first condition checks if it's token or native ticker
-    if (selectedAsset.tokenBalance !== null) {
-      if (e.target.value > selectedAsset.balance) {
-        setShowBalanceMessage("Insufficient tokens");
-        setAssetBalanceMessage("Insufficient tokens");
-      } else {
-        setShowBalanceMessage("");
-        setAssetBalanceMessage("");
-      }
-    } else {
-      if (e.target.value > selectedAsset.balance) {
-        setShowBalanceMessage("Insufficient tokens");
-        setAssetBalanceMessage("Insufficient tokens");
-      } else {
-        setShowBalanceMessage("");
-        setAssetBalanceMessage("");
-      }
-    }
+    // Updating the parent component with the new input value
+    updateAssetInput(inputValue);
+
+    // Determining the appropriate balance message based on asset type and balance
+    const isBalanceSufficient = inputValue <= selectedAsset.balance;
+    const insufficientMessage =
+      selectedAsset.tokenBalance !== null
+        ? "Insufficient tokens"
+        : "Insufficient funds";
+
+    // Seting the balance messages based on sufficiency
+    const balanceMessage = isBalanceSufficient ? "" : insufficientMessage;
+    setShowBalanceMessage(balanceMessage);
+    setAssetBalanceMessage(balanceMessage);
   };
 
   const handleMaxValue = () => {
@@ -56,6 +48,9 @@ const Asset = ({
     // clicking on Max value
     // show Clear button
     setShowClear(true);
+
+    setShowBalanceMessage("");
+    setAssetBalanceMessage("");
   };
 
   const handleClearValue = () => {
@@ -76,6 +71,7 @@ const Asset = ({
   //  parent component (e.g. SendFromTo.js)
   useEffect(() => {
     updateAssetInput("");
+    setAssetBalanceMessage("");
   }, [selectedAsset?.tokenSymbol]);
 
   // console.log("selectedAsset", selectedAsset);
