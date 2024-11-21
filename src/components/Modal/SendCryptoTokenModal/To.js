@@ -107,6 +107,7 @@ const To = ({ setShowAsset, showAsset, assetInput, updateAssetInput }) => {
           makeAssetsDisable={true}
           assetInput={assetInput}
           updateAssetInput={updateAssetInput}
+          showAdditonalInfo={true}
         />
       )}
     </div>

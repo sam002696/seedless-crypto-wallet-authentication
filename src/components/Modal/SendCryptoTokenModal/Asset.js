@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { useAssetList } from "../../../context/AssetListContext";
 import { useAsset } from "../../../context/AssetContext";
@@ -8,30 +8,73 @@ const Asset = ({
   updateAssetInput,
   showDownIcon,
   makeAssetsDisable,
+  showAdditonalInfo,
 }) => {
   const [showClear, setShowClear] = useState(false);
-  const { selectedAsset } = useAsset();
+  const [showBalanceMessage, setShowBalanceMessage] = useState("");
+  const { selectedAsset, setAssetBalanceMessage } = useAsset();
   const { setShowAssetList } = useAssetList();
 
+  // function to show all the assets in
+  // one place (e.g. SendFromTo.js)
   const handleAssetList = () => {
     setShowAssetList(true);
   };
 
   const handleChange = (e) => {
-    updateAssetInput(e.target.value);
+    const inputValue = e.target.value;
+
+    // Updating the parent component with the new input value
+    updateAssetInput(inputValue);
+
+    // Determining the appropriate balance message based on asset type and balance
+    const isBalanceSufficient = inputValue <= selectedAsset.balance;
+    const insufficientMessage =
+      selectedAsset.tokenBalance !== null
+        ? "Insufficient tokens"
+        : "Insufficient funds";
+
+    // Seting the balance messages based on sufficiency
+    const balanceMessage = isBalanceSufficient ? "" : insufficientMessage;
+    setShowBalanceMessage(balanceMessage);
+    setAssetBalanceMessage(balanceMessage);
   };
 
   const handleMaxValue = () => {
+    // setting max value of the token in
+    // parent component (e.g. SendFromTo.js)
     updateAssetInput(selectedAsset?.balance);
+
+    // clicking on Max value
+    // show Clear button
     setShowClear(true);
+
+    setShowBalanceMessage("");
+    setAssetBalanceMessage("");
   };
 
   const handleClearValue = () => {
+    // clear parent component's input value
+    //  parent component (e.g. SendFromTo.js)
     updateAssetInput("");
+
+    // makes the Max button
+    // appear again
     setShowClear(false);
+
+    // clears balance message(if any)
+    setShowBalanceMessage("");
   };
 
-  console.log("selectedAsset", selectedAsset);
+  // Clicking on different token
+  // clears previous input value of user (if any)
+  //  parent component (e.g. SendFromTo.js)
+  useEffect(() => {
+    updateAssetInput("");
+    setAssetBalanceMessage("");
+  }, [selectedAsset?.tokenSymbol]);
+
+  // console.log("selectedAsset", selectedAsset);
 
   return (
     <>
@@ -58,13 +101,20 @@ const Asset = ({
             type="text"
             value={assetInput}
             onChange={handleChange}
-            placeholder="Enter value"
-            className="w-1/2 p-2 border rounded-md text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs"
+            placeholder=""
+            className="w-1/2 p-2 border rounded-md text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs text-end"
           />
         </div>
-        <div className="mt-2 mx-1 flex justify-between items-center">
+        <div
+          className={`mt-2 mx-1 flex justify-between items-center ${
+            showAdditonalInfo && "hidden"
+          }`}
+        >
           <p className=" text-xs text-gray-500">
-            Balance : {selectedAsset?.balance}
+            Balance : {selectedAsset?.balance}{" "}
+            <span className="text-red-500 font-semibold">
+              {showBalanceMessage}
+            </span>
           </p>
           {showClear ? (
             <button

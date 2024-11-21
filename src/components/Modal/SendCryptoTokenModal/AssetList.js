@@ -10,8 +10,9 @@ const AssetList = () => {
   const selectedNetworkInfo = useSelector(selectNetwork);
   const { selectedAsset, selectAsset } = useAsset();
 
-  console.log("selectedNetworkInfo", selectedNetworkInfo);
+  // console.log("selectedNetworkInfo", selectedNetworkInfo);
 
+  // handles the key, pair value of the asset
   const handleTokenAsset = (asset) => {
     const defaultAsset = {
       balance: asset.balance,
@@ -27,6 +28,7 @@ const AssetList = () => {
     setShowAssetList(false);
   };
 
+  // handles the key, pair value of the asset
   const handleNativeNetworkInfo = () => {
     const defaultAsset = {
       balance: selectedNetworkInfo.balance,
