@@ -10,6 +10,7 @@ import From from "./From";
 import To from "./To";
 import AssetList from "./AssetList";
 import { useAssetList } from "../../../context/AssetListContext";
+import { useAsset } from "../../../context/AssetContext";
 
 const userAddress = AuthUser?.getLoggedInUserAddress() || "0x000000";
 
@@ -35,26 +36,44 @@ const userAccounts = [
 ];
 
 const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
+  const { assetBalanceMessage } = useAsset();
   const { showAssetList } = useAssetList();
   const [selectedAccount, setSelectedAccount] = useState(userAccounts[0]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [showAsset, setShowAsset] = useState(false);
 
+  // parent input state to control
+  // asset input value
   const [assetInput, setAssetInput] = useState(() => {
     return localStorage.getItem("assetInput") || "";
   });
 
+  // updating asset's input
+  // and setting the value in
+  // localstorage everytime
   const updateAssetInput = (value) => {
     setAssetInput(value);
     localStorage.setItem("assetInput", value);
   };
 
+  // outside clicking the modal
+  // closes the modal and
+  // removes items related to
+  // receiver's public address
+  const handleCloseDialog = () => {
+    setOpenCryptoTokenSend(false);
+    localStorage.removeItem("isValid");
+    localStorage.removeItem("displayAddress");
+  };
+
+  // console.log("assetBalanceMessage", assetBalanceMessage);
+
   return (
     <>
       <Dialog
         open={openCryptoTokenSend}
-        onClose={setOpenCryptoTokenSend}
+        onClose={handleCloseDialog}
         className="relative z-10"
       >
         <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
@@ -70,6 +89,13 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
                     {showAssetList ? "Select asset to send" : "SEND"}
                   </DialogTitle>
                 </div>
+
+                {/* 
+                
+                shows all the assets when clicked
+                e.g Asset.js 
+                
+                */}
 
                 {showAssetList ? (
                   <>
@@ -100,16 +126,21 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Controllers for the modal */}
+
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                       <button
+                        onClick={handleCloseDialog}
                         type="button"
                         className="text-sm/6 font-semibold text-gray-900"
                       >
                         Cancel
                       </button>
                       <button
-                        type="submit"
-                        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        disabled={assetBalanceMessage}
+                        type="button"
+                        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-500"
                       >
                         Continue
                       </button>

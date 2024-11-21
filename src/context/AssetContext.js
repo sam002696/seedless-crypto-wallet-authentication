@@ -11,6 +11,8 @@ export const useAsset = () => useContext(AssetContext);
 export const AssetProvider = ({ children }) => {
   const selectedNetworkInfo = useSelector(selectNetwork);
 
+  const [assetBalanceMessage, setAssetBalanceMessage] = useState("");
+
   const [selectedAsset, setSelectedAsset] = useState({
     balance: null,
     tokenAddress: null,
@@ -43,7 +45,14 @@ export const AssetProvider = ({ children }) => {
   };
 
   return (
-    <AssetContext.Provider value={{ selectedAsset, selectAsset }}>
+    <AssetContext.Provider
+      value={{
+        selectedAsset,
+        selectAsset,
+        setAssetBalanceMessage,
+        assetBalanceMessage,
+      }}
+    >
       {children}
     </AssetContext.Provider>
   );

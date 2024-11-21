@@ -11,19 +11,19 @@ const From = ({
   assetInput,
   updateAssetInput,
 }) => {
-  // const [showBalance, setShowBalance] = useState();
-
+  // to open all the accounts of the wallet
   const handleDropdownToggle = () => {
     setIsOpen(!isOpen);
   };
 
   const handleOptionClick = (account) => {
-    handleAccountSelect(account);
-    setIsOpen(false);
-  };
-
-  const handleAccountSelect = (account) => {
+    //  sets the value of
+    // the clicked account
     setSelectedAccount(account);
+
+    // clicking on one account
+    // closes the modal
+    setIsOpen(false);
   };
 
   return (
@@ -31,14 +31,14 @@ const From = ({
       <div className="relative col-span-full">
         <label
           htmlFor="account"
-          className="block text-sm font-medium text-gray-900"
+          className="block text-sm font-medium text-gray-900 mb-3"
         >
           From
         </label>
         <button
           id="account"
           onClick={handleDropdownToggle}
-          className="w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm flex justify-between items-center"
+          className="w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600  sm:text-sm flex justify-between items-center"
         >
           <div className="text-start">
             <p className="font-medium">
@@ -90,6 +90,7 @@ const From = ({
           </div>
         )}
 
+        {/* Asset component */}
         {showAsset && (
           <>
             <Asset
@@ -97,6 +98,7 @@ const From = ({
               updateAssetInput={updateAssetInput}
               showDownIcon={true}
               makeAssetsDisable={false}
+              showAdditonalInfo={false}
             />
           </>
         )}
