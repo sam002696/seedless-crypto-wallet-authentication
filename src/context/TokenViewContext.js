@@ -7,12 +7,16 @@ export const TokenViewProvider = ({ children }) => {
     return JSON.parse(localStorage.getItem("isTokenView")) || false;
   });
 
+  const [selectedToken, setSelectedToken] = useState(null); // New state for selected token
+
   useEffect(() => {
     localStorage.setItem("isTokenView", JSON.stringify(isTokenView));
   }, [isTokenView]);
 
   return (
-    <TokenViewContext.Provider value={{ isTokenView, setIsTokenView }}>
+    <TokenViewContext.Provider
+      value={{ isTokenView, setIsTokenView, selectedToken, setSelectedToken }}
+    >
       {children}
     </TokenViewContext.Provider>
   );

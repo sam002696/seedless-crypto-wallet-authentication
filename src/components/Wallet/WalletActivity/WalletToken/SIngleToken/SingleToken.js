@@ -1,14 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SingleTokenInfo from "./SingleTokenInfo";
 import SingleTokenActivity from "./SingleTokenActivity";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useTokenView } from "../../../../../context/TokenViewContext";
+import { Token } from "../../../../../helpers/Token";
 
 const SingleToken = () => {
-  const { setIsTokenView } = useTokenView();
+  const { setIsTokenView, selectedToken } = useTokenView();
+
+  console.log("selectedToken", selectedToken);
+
+  const [token, setToken] = useState(null); // Local state to hold token
+
+  useEffect(() => {
+    if (selectedToken !== null) {
+      // Save selected token to local storage
+      Token.saveSelectedToken(selectedToken);
+      setToken(selectedToken); // Update local state
+    } else {
+      // Fetch token from local storage if `selectedToken` is null
+      const storedToken = Token.getsingleToken();
+      if (storedToken) {
+        setToken(storedToken);
+      }
+    }
+  }, [selectedToken]);
+
+  if (!token) {
+    return (
+      <div className="text-center p-4">
+        <p>Loading token details...</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="py-4">
+      <div className="py-8 max-w-2xl mx-auto">
         {/* Back button, ARISPAY label, and three-dot menu */}
         <div className="flex justify-between items-center px-5 mb-4">
           {/* Back button and ARISPAY label */}
@@ -17,7 +45,9 @@ const SingleToken = () => {
               onClick={() => setIsTokenView(false)}
               className="h-6 w-6 text-gray-700 cursor-pointer"
             />
-            <span className="text-xl font-semibold text-gray-900">ARISPAY</span>
+            <span className="text-xl font-semibold text-gray-900">
+              {token?.tokenSymbol}
+            </span>
           </div>
 
           {/* Three-dot menu */}
@@ -46,8 +76,8 @@ const SingleToken = () => {
 
         {/* Token Info and Activity Components */}
         <div className="p-5">
-          <SingleTokenInfo />
-          <SingleTokenActivity />
+          <SingleTokenInfo token={token} setToken={setToken} />
+          <SingleTokenActivity token={token} setToken={setToken} />
         </div>
       </div>
     </>
