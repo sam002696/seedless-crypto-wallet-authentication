@@ -17,7 +17,7 @@ const SendTokenHome = () => {
           <div className="bg-white w-full max-w-4xl shadow-lg">
             <WalletInfo />
           </div>
-          <div className="bg-white w-full max-w-2xl shadow-lg mt-5">
+          <div className="bg-white w-full max-w-2xl shadow-lg mt-5 rounded-lg">
             <SendToken />
           </div>
         </div>

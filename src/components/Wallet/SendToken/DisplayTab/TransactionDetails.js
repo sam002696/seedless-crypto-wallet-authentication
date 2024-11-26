@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
+import { PencilIcon } from "@heroicons/react/24/solid";
+import EditGasEstimation from "../Modal/EditGasEstimation";
 
 const TransactionDetails = () => {
+  const handleGasFee = () => {
+    console.log("clicked");
+    setOpen(true);
+  };
+
+  const [open, setOpen] = useState(false);
+
   return (
     <>
       {/* Estimated changes */}
@@ -33,7 +42,12 @@ const TransactionDetails = () => {
             <div className="flex  justify-between">
               <p className="font-bold text-xl">Estimated fee</p>
               <div>
-                <p className="text-end">Edit</p>
+                <div>
+                  <PencilIcon
+                    onClick={handleGasFee}
+                    className="size-5 ml-auto mb-2 text-blue-500 cursor-pointer"
+                  />
+                </div>
                 <p className="font-medium text-gray-400 text-lg">
                   0.00077992 SepoliaETH
                 </p>
@@ -55,6 +69,8 @@ const TransactionDetails = () => {
           </div>
         </div>
       </div>
+
+      <EditGasEstimation open={open} setOpen={setOpen} />
     </>
   );
 };
