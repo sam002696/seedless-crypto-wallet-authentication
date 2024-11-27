@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import TransactionDetails from "./DisplayTab/TransactionDetails";
 import TransactionHex from "./DisplayTab/TransactionHex";
 
-const DisplayTransaction = () => {
+const DisplayTransaction = ({ transactionData }) => {
   const walletTransactionInfo = ["Details", "HEX"];
   const [walletTransaction, setWalletTransaction] = useState("Details");
 
   const displayTabContent = () => {
     switch (walletTransaction) {
       case "Details":
-        return <TransactionDetails />;
+        return <TransactionDetails transactionData={transactionData} />;
       case "HEX":
         return <TransactionHex />;
 
@@ -40,6 +40,15 @@ const DisplayTransaction = () => {
 
       {/* Content Area */}
       <div className="mt-4 px-3">{displayTabContent()}</div>
+
+      <div className="flex justify-between items-center mt-6 px-4">
+        <button className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300">
+          Reject
+        </button>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+          Confirm
+        </button>
+      </div>
     </div>
   );
 };

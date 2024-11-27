@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import EditGasEstimation from "../Modal/EditGasEstimation";
 
-const TransactionDetails = () => {
+const TransactionDetails = ({ transactionData }) => {
   const handleGasFee = () => {
     console.log("clicked");
     setOpen(true);
@@ -24,10 +24,12 @@ const TransactionDetails = () => {
             </div>
             <div className="flex items-center">
               <p className="mr-3  px-2 py-1 rounded-xl text-red-700 bg-red-100 text-xl">
-                -9
+                -{transactionData?.transactionDetails?.amount}
               </p>
               <p className="px-2 py-1 rounded-xl text-gray-700 bg-gray-100 text-xl">
-                0*28f272882
+                {transactionData?.transactionDetails?.tokenAddress.slice(0, 10)}
+                ...$
+                {transactionData?.transactionDetails?.tokenAddress.slice(-8)}
               </p>
             </div>
           </div>
@@ -35,6 +37,8 @@ const TransactionDetails = () => {
       </div>
 
       {/* Estimated fee */}
+
+      {/* To-do */}
 
       <div className="mt-5">
         <div className="flex flex-col border-2 border-gray-300 p-3 rounded-md">
