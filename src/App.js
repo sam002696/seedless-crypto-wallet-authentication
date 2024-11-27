@@ -6,6 +6,7 @@ import CreateAccount from "./components/Auth/CreateAccount/CreateAccount";
 import AccessAccount from "./components/Auth/AccessAccount/AccessAccount";
 import UserAccount from "./components/Auth/UserAccount/UserAccount";
 import WalletHome from "./components/Wallet/WalletHome";
+import SendTokenHome from "./components/Wallet/SendToken/SendTokenHome";
 // import SingleToken from "./components/Wallet/WalletActivity/WalletToken/SingleToken";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route exact path="/access-account" component={AccessAccount} />
         <Route exact path="/user-account" component={UserAccount} />
         <Route exact path="/wallet" component={WalletHome} />
+        <Route exact path="/send-token" component={SendTokenHome} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={SignUp} />
         {/* <Route exact path="/single-token" component={SingleToken} /> */}
