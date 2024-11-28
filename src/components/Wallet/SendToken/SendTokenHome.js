@@ -15,7 +15,7 @@ const SendTokenHome = () => {
         </div>
         <div className=" min-h-screen flex flex-col items-center justify-center">
           <div className="bg-white w-full max-w-4xl shadow-lg">
-            <WalletInfo />
+            <WalletInfo disableNetwork={true} />
           </div>
           <div className="bg-white w-full max-w-2xl shadow-lg mt-5 rounded-lg">
             <SendToken />
