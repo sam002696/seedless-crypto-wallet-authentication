@@ -1,110 +1,3 @@
-// import React from "react";
-// import {
-//   Dialog,
-//   DialogBackdrop,
-//   DialogPanel,
-//   DialogTitle,
-// } from "@headlessui/react";
-
-// const TransactionDetailsModal = ({ open, setOpen, transactionDetails }) => {
-//   return (
-//     <Dialog
-//       open={open}
-//       onClose={() => setOpen(false)}
-//       className="relative z-10"
-//     >
-//       <DialogBackdrop
-//         transition
-//         className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-//       />
-//       <div className="fixed inset-0 z-10 overflow-y-auto">
-//         <div className="flex items-center justify-center min-h-screen p-4">
-//           <DialogPanel className="relative transform overflow-hidden rounded-lg bg-white px-6 py-8 text-left shadow-xl transition-all sm:max-w-lg">
-//             <div className="space-y-6">
-//               {/* Status and Title */}
-//               <div className="text-center">
-//                 <p className="text-sm font-medium text-green-600">Status</p>
-//                 <h3 className="mt-2 text-xl font-bold text-gray-900">
-//                   {transactionDetails.status || "Pending"}
-//                 </h3>
-//                 <p className="mt-1 text-sm text-gray-600">
-//                   {transactionDetails.timestamp || "Timestamp not available"}
-//                 </p>
-//               </div>
-
-//               {/* From and To Section */}
-//               <div>
-//                 <h4 className="text-sm font-semibold text-gray-700">From</h4>
-//                 <p className="truncate text-gray-600">
-//                   {transactionDetails.from || "Sender address not available"}
-//                 </p>
-
-//                 <h4 className="mt-4 text-sm font-semibold text-gray-700">To</h4>
-//                 <p className="truncate text-gray-600">
-//                   {transactionDetails.to || "Recipient address not available"}
-//                 </p>
-//               </div>
-
-//               {/* Transaction Information */}
-//               <div className="border-t border-gray-200 pt-4">
-//                 <h4 className="text-sm font-semibold text-gray-700">
-//                   Transaction
-//                 </h4>
-//                 <div className="mt-2 space-y-2 text-sm text-gray-600">
-//                   <p>
-//                     <span className="font-semibold">Nonce:</span>{" "}
-//                     {transactionDetails.nonce || "N/A"}
-//                   </p>
-//                   <p>
-//                     <span className="font-semibold">Amount:</span>{" "}
-//                     {transactionDetails.amount || "0"} ARISPAY
-//                   </p>
-//                   <p>
-//                     <span className="font-semibold">Gas Used:</span>{" "}
-//                     {transactionDetails.gasUsed || "N/A"} Units
-//                   </p>
-//                   <p>
-//                     <span className="font-semibold">Base Fee:</span>{" "}
-//                     {transactionDetails.baseFee || "N/A"} GWEI
-//                   </p>
-//                   <p>
-//                     <span className="font-semibold">Priority Fee:</span>{" "}
-//                     {transactionDetails.priorityFee || "N/A"} GWEI
-//                   </p>
-//                   <p>
-//                     <span className="font-semibold">Total Fee:</span>{" "}
-//                     {transactionDetails.totalFee || "N/A"} SepoliaETH
-//                   </p>
-//                 </div>
-//               </div>
-
-//               {/* Action Buttons */}
-//               <div className="flex justify-center gap-4 mt-6">
-//                 <a
-//                   href={transactionDetails.explorerLink || "#"}
-//                   target="_blank"
-//                   rel="noopener noreferrer"
-//                   className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
-//                 >
-//                   View on Explorer
-//                 </a>
-//                 <button
-//                   onClick={() => setOpen(false)}
-//                   className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
-//                 >
-//                   Close
-//                 </button>
-//               </div>
-//             </div>
-//           </DialogPanel>
-//         </div>
-//       </div>
-//     </Dialog>
-//   );
-// };
-
-// export default TransactionDetailsModal;
-
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { useSelector } from "react-redux";
@@ -215,7 +108,7 @@ const TransactionDetailsModal = ({ open, setOpen, transactionDetails }) => {
       <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75" />
       <div className="fixed inset-0 z-10 overflow-y-auto">
         <div className="flex items-center justify-center min-h-screen p-4">
-          <DialogPanel className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+          <DialogPanel className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
             {loading ? (
               <p>Loading transaction details...</p>
             ) : error ? (
@@ -270,8 +163,8 @@ const TransactionDetailsModal = ({ open, setOpen, transactionDetails }) => {
                     {/* First Column for Contract Address */}
                     <div className="flex flex-col mr-4">
                       <span className="text-md font-semibold p-1">FROM</span>
-                      <span className="bg-yellow-200 p-2 px-4 rounded-full">
-                        {details.from.slice(0, 10)}...{details.from.slice(-4)}
+                      <span className="bg-yellow-200 p-2 px-3 rounded-full">
+                        {details.from.slice(0, 5)}...{details.from.slice(-4)}
                       </span>
                     </div>
 
@@ -279,34 +172,74 @@ const TransactionDetailsModal = ({ open, setOpen, transactionDetails }) => {
                       <span className="text-md font-semibold p-1 text-end">
                         TO
                       </span>
-                      <span className="bg-gray-200 p-2 px-4 rounded-full">
-                        {details.to.slice(0, 10)}...{details.to.slice(-4)}
+                      <span className="bg-gray-200 p-2 px-3 rounded-full">
+                        {details.to.slice(0, 5)}...{details.to.slice(-4)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="text-sm">
-                    <p>
-                      <strong>Nonce:</strong> {details.nonce}
-                    </p>
-                    <p>
-                      <strong>Amount:</strong> {details.value} ARISPAY
-                    </p>
-                    <p>
-                      <strong>Gas Limit:</strong> {details.gasLimit} Units
-                    </p>
-                    <p>
-                      <strong>Gas Used:</strong> {details.gasUsed} Units
-                    </p>
-                    <p>
-                      <strong>Base Fee:</strong> {details.gasPriceGwei} GWEI
-                    </p>
-                    <p>
-                      <strong>Priority Fee:</strong> {details.priorityFee} GWEI
-                    </p>
-                    <p>
-                      <strong>Total Fee:</strong> {details.totalFee} SepoliaETH
-                    </p>
+                  <div>
+                    <h2 className="text-md font-bold text-start px-4">
+                      Transaction
+                    </h2>
+                    <div className="flex justify-between items-start rounded-lg p-4 mb-2">
+                      {/* First Column for Contract Address */}
+                      <div className="flex flex-col mr-4">
+                        <span className="text-sm font-normal p-1">Nonce</span>
+                        <span className="text-sm font-normal p-1">Amount</span>
+                        <span className="text-sm font-normal p-1">
+                          Gas Limit (Units)
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Gas Used (Units)
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Base Fee (GWEI)
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Priority Fee (GWEI)
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Total gas fee
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Max fee per gas
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Total Fee
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col text-end">
+                        <span className="text-sm font-normal p-1">
+                          {details.nonce}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.value}{" "}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.gasLimit}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.gasUsed}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.gasPriceGwei}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.priorityFee}
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Total gas fee
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          Max fee per gas
+                        </span>
+                        <span className="text-sm font-normal p-1">
+                          {details.totalFee}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )
