@@ -4,16 +4,18 @@ import TransferInfo from "./TransferInfo";
 import DisplayTransaction from "./DisplayTransaction";
 
 const SendToken = () => {
+  const transactionData = JSON.parse(localStorage.getItem("dataToSend"));
+
   return (
     <>
       <div className="">
         {/* Header */}
-        <SendTokenHeader />
+        <SendTokenHeader transactionData={transactionData.network} />
         {/* Transfer Info */}
-        <TransferInfo />
+        <TransferInfo transactionData={transactionData} />
 
         {/* Display Details, Hex */}
-        <DisplayTransaction />
+        <DisplayTransaction transactionData={transactionData} />
       </div>
     </>
   );

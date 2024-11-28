@@ -31,7 +31,7 @@ const To = ({ setShowAsset, showAsset, assetInput, updateAssetInput }) => {
 
       // Save isValid and displayAddress to localStorage
       localStorage.setItem("isValid", JSON.stringify(true));
-      localStorage.setItem("displayAddress", truncatedAddress);
+      localStorage.setItem("displayAddress", inputValue);
 
       // Control the Asset component
       setShowAsset(true);
@@ -76,7 +76,9 @@ const To = ({ setShowAsset, showAsset, assetInput, updateAssetInput }) => {
       <div className="mt-2">
         {isValid ? (
           <div className="flex items-center justify-between">
-            <p className="text-gray-900">{displayAddress}</p>
+            <p className="text-gray-900">
+              {displayAddress.slice(0, 10)}...${displayAddress.slice(-8)}
+            </p>
             <button
               type="button"
               onClick={handleCancel}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Dialog,
   DialogBackdrop,
@@ -11,6 +12,7 @@ import To from "./To";
 import AssetList from "./AssetList";
 import { useAssetList } from "../../../context/AssetListContext";
 import { useAsset } from "../../../context/AssetContext";
+import { Network } from "../../../helpers/Network";
 
 const userAddress = AuthUser?.getLoggedInUserAddress() || "0x000000";
 
@@ -36,7 +38,8 @@ const userAccounts = [
 ];
 
 const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
-  const { assetBalanceMessage } = useAsset();
+  const history = useHistory();
+  const { assetBalanceMessage, selectedAsset } = useAsset();
   const { showAssetList } = useAssetList();
   const [selectedAccount, setSelectedAccount] = useState(userAccounts[0]);
 
@@ -68,6 +71,33 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
   };
 
   // console.log("assetBalanceMessage", assetBalanceMessage);
+
+  const demoData = {
+    sender: {
+      accountName: "Account 1",
+      address: selectedAccount.publicAddress,
+    },
+    receiver: {
+      accountName: "Account 2",
+      address: localStorage.getItem("displayAddress"),
+    },
+    transactionDetails: {
+      tokenName: selectedAsset.tokenSymbol,
+      tokenAddress: selectedAsset.tokenAddress,
+      amount: Number(assetInput),
+    },
+    network: {
+      name: Network.getNetworkName(),
+    },
+  };
+
+  const handleContinue = () => {
+    console.log("Clicked");
+
+    localStorage.setItem("dataToSend", JSON.stringify(demoData));
+
+    history.push("/send-token");
+  };
 
   return (
     <>
@@ -138,6 +168,7 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
                         Cancel
                       </button>
                       <button
+                        onClick={handleContinue}
                         disabled={assetBalanceMessage || assetInput === ""}
                         type="button"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-500"

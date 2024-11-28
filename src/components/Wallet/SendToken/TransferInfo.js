@@ -1,22 +1,29 @@
 import React from "react";
 
-const TransferInfo = () => {
+const TransferInfo = ({ transactionData }) => {
   return (
     <>
       <div>
         {/* Sender to receiver */}
         <div className=" flex flex-row justify-between p-3">
-          <div>Account 1</div>
+          <div>{transactionData.sender.accountName}</div>
           <div>---</div>
-          <div>Account 2</div>
+          <div>{transactionData.receiver.accountName}</div>
         </div>
         {/* Transfer amount */}
         <div className="px-5 py-5 bg-gray-100">
           <div>
-            <p>0x8E2fC...1Ac0</p>
+            <p>
+              {transactionData?.transactionDetails?.tokenAddress.slice(0, 10)}
+              ...$
+              {transactionData?.transactionDetails?.tokenAddress.slice(-8)}
+            </p>
           </div>
           <div className="mt-3">
-            <p className="text-bold text-5xl">9 ARISPAY</p>
+            <p className="text-bold text-5xl">
+              {transactionData.transactionDetails.amount}{" "}
+              {transactionData.transactionDetails.tokenName}
+            </p>
           </div>
         </div>
       </div>
