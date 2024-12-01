@@ -18,7 +18,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { getTokenBalance } from "../../../utilities/getTokenBalance";
 
-const WalletInfo = () => {
+const WalletInfo = ({ disableNetwork }) => {
   const selectedNetworkInfo = useSelector(selectNetwork);
   const dispatch = useDispatch();
   const [selectedNetwork, setSelectedNetwork] = useState({
@@ -142,7 +142,8 @@ const WalletInfo = () => {
         <div className="flex justify-start ">
           <button
             onClick={handleNetwork}
-            className="font-medium text-sm bg-gray-100 px-3 py-2 rounded-2xl"
+            disabled={disableNetwork}
+            className="font-medium text-sm bg-gray-100 px-3 py-2 rounded-2xl disabled:cursor-not-allowed"
           >
             {Network.getNetworkName() || selectedNetwork.name}
           </button>

@@ -11,7 +11,7 @@ const DisplayTransaction = ({ transactionData }) => {
       case "Details":
         return <TransactionDetails transactionData={transactionData} />;
       case "HEX":
-        return <TransactionHex />;
+        return <TransactionHex transactionData={transactionData} />;
 
       // eslint-disable-next-line no-fallthrough
       default:
@@ -26,7 +26,7 @@ const DisplayTransaction = ({ transactionData }) => {
         {walletTransactionInfo.map((item) => (
           <button
             key={item}
-            className={`flex-1 py-3 text-center font-bold text-base ${
+            className={`flex-1 py-3 text-center font-bold text-base cursor-pointer ${
               walletTransaction === item
                 ? "border-b-4 border-blue-500 text-blue-500"
                 : "border-b-4 border-gray-300 text-gray-400"
@@ -45,7 +45,10 @@ const DisplayTransaction = ({ transactionData }) => {
         <button className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300">
           Reject
         </button>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+        <button
+          disabled={transactionData?.transactionDetails?.amount === 0}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 disabled:cursor-not-allowed disabled:bg-gray-300"
+        >
           Confirm
         </button>
       </div>

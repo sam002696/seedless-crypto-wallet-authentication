@@ -19,19 +19,36 @@ const TransactionDetails = ({ transactionData }) => {
             <p className="font-bold text-xl">Estimated changes</p>
           </div>
           <div className="flex flex-row items-center justify-between">
-            <div>
-              <p className="text-xl">You send</p>{" "}
-            </div>
-            <div className="flex items-center">
-              <p className="mr-3  px-2 py-1 rounded-xl text-red-700 bg-red-100 text-xl">
-                -{transactionData?.transactionDetails?.amount}
-              </p>
-              <p className="px-2 py-1 rounded-xl text-gray-700 bg-gray-100 text-xl">
-                {transactionData?.transactionDetails?.tokenAddress.slice(0, 10)}
-                ...$
-                {transactionData?.transactionDetails?.tokenAddress.slice(-8)}
-              </p>
-            </div>
+            {transactionData?.transactionDetails?.amount === 0 ? (
+              <>
+                <div>
+                  <p className="text-gray-500 font-semibold">
+                    No changes predicted for your wallet
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xl">You send</p>{" "}
+                </div>
+                <div className="flex items-center">
+                  <p className="mr-3  px-2 py-1 rounded-xl text-red-700 bg-red-100 text-xl">
+                    -{transactionData?.transactionDetails?.amount}
+                  </p>
+                  <p className="px-2 py-1 rounded-xl text-gray-700 bg-gray-100 text-xl">
+                    {transactionData?.transactionDetails?.tokenAddress.slice(
+                      0,
+                      10
+                    )}
+                    ...$
+                    {transactionData?.transactionDetails?.tokenAddress.slice(
+                      -8
+                    )}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
