@@ -12,7 +12,9 @@ import To from "./To";
 import AssetList from "./AssetList";
 import { useAssetList } from "../../../context/AssetListContext";
 import { useAsset } from "../../../context/AssetContext";
-import { Network } from "../../../helpers/Network";
+// import { Network } from "../../../helpers/Network";
+import { useSelector } from "react-redux";
+import { selectNetwork } from "../../../reducers/networkSlice";
 
 const userAddress = AuthUser?.getLoggedInUserAddress() || "0x000000";
 
@@ -38,6 +40,7 @@ const userAccounts = [
 ];
 
 const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
+  const selectedNetworkInfo = useSelector(selectNetwork);
   const history = useHistory();
   const { assetBalanceMessage, selectedAsset } = useAsset();
   const { showAssetList } = useAssetList();
@@ -87,7 +90,9 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
       amount: Number(assetInput),
     },
     network: {
-      name: Network.getNetworkName(),
+      name: selectedNetworkInfo?.name,
+      chainId: selectedNetworkInfo?.chainId,
+      nativeCurrency: selectedNetworkInfo?.ticker,
     },
   };
 

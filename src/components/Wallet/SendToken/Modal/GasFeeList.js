@@ -26,7 +26,7 @@ const GasFeeList = ({
             </div>
             <div>
               <p className="text-sm">{option.maxFee}</p>
-              <p className="text-xs text-gray-500">{option.network}</p>
+              {/* <p className="text-xs text-gray-500">{option.network}</p> */}
             </div>
           </div>
         ))}
@@ -56,7 +56,7 @@ const GasFeeList = ({
       {/* Network Status */}
       <div className="mt-6 p-3 bg-gray-50 rounded-lg text-sm">
         <p>Base Fee: {networkStatus.baseFee}</p>
-        <p>Priority Fee: {networkStatus.priorityFee}</p>
+        <p>Congestion: {networkStatus.congestion}</p>
         <p>
           Status: <span className="font-semibold">{networkStatus.status}</span>
         </p>

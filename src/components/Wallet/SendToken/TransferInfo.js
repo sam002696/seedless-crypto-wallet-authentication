@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { appendJazziconToRef } from "../../../utilities/appendJazziconUtils";
+import { ArrowRightCircleIcon } from "@heroicons/react/24/solid";
 
 const TransferInfo = ({ transactionData }) => {
   // Refs to hold Jazzicon elements
@@ -24,7 +25,9 @@ const TransferInfo = ({ transactionData }) => {
           ></div>
           <span className="ml-3">{transactionData.sender.accountName}</span>
         </div>
-        <div>---</div>
+        <div>
+          <ArrowRightCircleIcon className="w-10 h-10 fill-blue-400" />
+        </div>
         <div className="flex items-center">
           {/* Receiver Jazzicon */}
           <div
@@ -40,7 +43,7 @@ const TransferInfo = ({ transactionData }) => {
         <div>
           <p>
             {transactionData?.transactionDetails?.tokenAddress.slice(0, 10)}
-            ...$
+            ...
             {transactionData?.transactionDetails?.tokenAddress.slice(-8)}
           </p>
         </div>

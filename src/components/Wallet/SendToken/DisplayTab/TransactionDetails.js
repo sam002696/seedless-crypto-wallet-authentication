@@ -41,7 +41,7 @@ const TransactionDetails = ({ transactionData }) => {
                       0,
                       10
                     )}
-                    ...$
+                    ...
                     {transactionData?.transactionDetails?.tokenAddress.slice(
                       -8
                     )}
@@ -91,7 +91,11 @@ const TransactionDetails = ({ transactionData }) => {
         </div>
       </div>
 
-      <EditGasEstimation open={open} setOpen={setOpen} />
+      <EditGasEstimation
+        transactionData={transactionData}
+        open={open}
+        setOpen={setOpen}
+      />
     </>
   );
 };
