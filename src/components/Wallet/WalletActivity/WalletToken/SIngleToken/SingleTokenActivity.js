@@ -3,12 +3,17 @@ import Web3 from "web3";
 import { AuthUser } from "../../../../../helpers/AuthUser";
 import { useSelector } from "react-redux";
 import { selectNetwork } from "../../../../../reducers/networkSlice";
+import TransactionDetailsModal from "../../../../Modal/TransactionHashDetailsModal/TransactionHashDetailsModal";
 
 const SingleTokenActivity = ({ token }) => {
   const [transactions, setTransactions] = useState([]);
   const [loggedInUserAddress, setLoggedInUserAddress] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const selectedNetworkInfo = useSelector(selectNetwork);
+
+  console.log("selectedNetworkInfo", selectedNetworkInfo);
 
   const blockExplorerBaseURLs = {
     1: "https://etherscan.io",
@@ -121,7 +126,12 @@ const SingleTokenActivity = ({ token }) => {
     return acc;
   }, {});
 
-  // Updated Conditional Rendering
+  // Handle transaction click to open modal
+  const handleTransactionClick = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return <div>Loading transactions...</div>;
   }
@@ -141,7 +151,8 @@ const SingleTokenActivity = ({ token }) => {
           {groupedTransactions[date].map((tx, index) => (
             <div
               key={index}
-              className="flex justify-between items-center bg-gray-100 rounded-lg p-4 mb-2 shadow-md"
+              onClick={() => handleTransactionClick(tx)}
+              className="flex justify-between items-center bg-gray-100 rounded-lg p-4 mb-2 shadow-md cursor-pointer hover:bg-gray-200"
             >
               <span className="text-gray-700">
                 {tx.from === loggedInUserAddress ? "Sent" : "Received"}{" "}
@@ -168,6 +179,21 @@ const SingleTokenActivity = ({ token }) => {
           ))}
         </div>
       ))}
+
+      {/* Transaction Details Modal */}
+      {selectedTransaction && (
+        <TransactionDetailsModal
+          open={isModalOpen}
+          setOpen={setIsModalOpen}
+          transactionDetails={{
+            status: selectedTransaction.status,
+            from: selectedTransaction.from,
+            to: selectedTransaction.to,
+            transactionHash: selectedTransaction.transactionHash,
+            explorerLink: `${blockExplorerURL}/tx/${selectedTransaction.transactionHash}`,
+          }}
+        />
+      )}
     </div>
   );
 };
