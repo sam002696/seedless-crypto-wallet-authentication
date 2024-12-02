@@ -5,17 +5,31 @@ const GasFeeList = ({
   setAdvancedGasFee,
   advancedOption,
   networkStatus,
+  setSelectedGasFee,
+  selectedGasFee,
+  setOpen,
+  animation,
 }) => {
   const handleAdvancedGasFee = () => {
     setAdvancedGasFee(true);
   };
+
+  const handleGasOption = (option) => {
+    localStorage.setItem("selectedGasFeeType", JSON.stringify(option.type));
+    setSelectedGasFee(option.type);
+    setOpen(false);
+  };
+
   return (
     <div>
       <div className="mt-4 space-y-4">
         {gasOptions.map((option, index) => (
           <div
+            onClick={() => handleGasOption(option)}
             key={index}
-            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-100"
+            className={`flex items-center justify-between p-3 border rounded-lg hover:bg-gray-100 cursor-pointer ${
+              selectedGasFee === option.type && "bg-gray-100"
+            }`}
           >
             <div className="flex items-center">
               <span className="mr-2 text-xl">{option.icon}</span>
@@ -25,7 +39,13 @@ const GasFeeList = ({
               </div>
             </div>
             <div>
-              <p className="text-sm">{option.maxFee}</p>
+              <p
+                className={`text-sm ${
+                  animation && " animate-pulse delay-500 duration-1000"
+                }`}
+              >
+                {option.maxFee}
+              </p>
               {/* <p className="text-xs text-gray-500">{option.network}</p> */}
             </div>
           </div>

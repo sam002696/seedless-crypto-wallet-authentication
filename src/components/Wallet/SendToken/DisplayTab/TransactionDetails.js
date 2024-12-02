@@ -1,14 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import EditGasEstimation from "../Modal/EditGasEstimation";
 
 const TransactionDetails = ({ transactionData }) => {
+  const [open, setOpen] = useState(false);
+  const [selectedGasFee, setSelectedGasFee] = useState(null);
+  const [gasMarket, setGasMarket] = useState({});
+  const [gasOptions, setGasOptions] = useState([]);
+
   const handleGasFee = () => {
-    console.log("clicked");
     setOpen(true);
   };
 
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const savedGasType = localStorage.getItem("selectedGasFeeType");
+    if (savedGasType) {
+      setSelectedGasFee(JSON.parse(savedGasType));
+    }
+  }, []);
+
+  // Set default gas fee to Market when gasOptions are updated
+  useEffect(() => {
+    if (gasOptions.length > 0) {
+      const marketOption = gasOptions.find(
+        (option) => option.type === (selectedGasFee || "Market")
+      );
+      if (marketOption) {
+        setGasMarket(marketOption);
+      }
+    }
+  }, [gasOptions, selectedGasFee]);
 
   return (
     <>
@@ -60,7 +81,7 @@ const TransactionDetails = ({ transactionData }) => {
       <div className="mt-5">
         <div className="flex flex-col border-2 border-gray-300 p-3 rounded-md">
           <div className="mb-5">
-            <div className="flex  justify-between">
+            <div className="flex justify-between">
               <p className="font-bold text-xl">Estimated fee</p>
               <div>
                 <div>
@@ -69,22 +90,29 @@ const TransactionDetails = ({ transactionData }) => {
                     className="size-5 ml-auto mb-2 text-blue-500 cursor-pointer"
                   />
                 </div>
+                {/* Display dynamic selectedGasFee value or fallback */}
                 <p className="font-medium text-gray-400 text-lg">
-                  0.00077992 SepoliaETH
+                  {gasMarket ? gasMarket.maxFee : "loading"}
                 </p>
               </div>
             </div>
           </div>
           <div className="flex flex-row items-center justify-between">
             <div>
-              <p className="text-xl">Advanced -60 sec</p>{" "}
+              {/* Display the selected gas fee's time */}
+              <p className="text-xl">
+                {gasMarket
+                  ? ` ${gasMarket.icon} ${gasMarket.type} - (${gasMarket.time})`
+                  : "loading"}
+              </p>
             </div>
             <div className="flex items-center">
-              <p className="mr-3  px-2 py-1 rounded-xl text-red-700 bg-red-100 text-xl">
+              <p className="mr-3 px-2 py-1 rounded-xl text-red-700 bg-red-100 text-xl">
                 Max fee:
               </p>
+              {/* Display dynamic maxFee */}
               <p className="px-2 py-1 rounded-xl text-gray-700 bg-gray-100 text-xl">
-                0.0018272737 SepoliaETH
+                {gasMarket ? gasMarket.maxFee : "loading"}
               </p>
             </div>
           </div>
@@ -95,6 +123,10 @@ const TransactionDetails = ({ transactionData }) => {
         transactionData={transactionData}
         open={open}
         setOpen={setOpen}
+        setGasOptions={setGasOptions}
+        gasOptions={gasOptions}
+        setSelectedGasFee={setSelectedGasFee}
+        selectedGasFee={selectedGasFee}
       />
     </>
   );

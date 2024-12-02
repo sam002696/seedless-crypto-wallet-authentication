@@ -4,82 +4,100 @@ import axios from "axios";
 import GasFeeList from "./GasFeeList";
 import AdvancedGasFeeForm from "./AdvancedGasFeeForm";
 
-const EditGasEstimation = ({ open, setOpen, transactionData }) => {
-  const [gasOptions, setGasOptions] = useState([]);
+const EditGasEstimation = ({
+  open,
+  setOpen,
+  transactionData,
+  setGasOptions,
+  gasOptions,
+  setSelectedGasFee,
+  selectedGasFee,
+}) => {
   const [networkStatus, setNetworkStatus] = useState({});
   const [advancedGasFee, setAdvancedGasFee] = useState(false);
+  const [animation, setAnimation] = useState(false);
+
+  const fetchGasFees = async () => {
+    if (!transactionData?.network.chainId) return;
+
+    setAnimation(true);
+    try {
+      const response = await axios.get(
+        `https://gas.api.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9/networks/${transactionData.network.chainId}/suggestedGasFees`
+      );
+
+      const data = response.data;
+
+      const options = [
+        {
+          type: "Low",
+          time: `${data.low.minWaitTimeEstimate / 1000} - ${
+            data.low.maxWaitTimeEstimate / 1000
+          } sec`,
+          maxFee: `${(parseFloat(data.low.suggestedMaxFeePerGas) / 1e9).toFixed(
+            8
+          )} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          priorityFee: `${(
+            parseFloat(data.low.suggestedMaxPriorityFeePerGas) / 1e9
+          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          network: transactionData?.network.name,
+          icon: "🐢",
+        },
+        {
+          type: "Market",
+          time: `${data.medium.minWaitTimeEstimate / 1000} - ${
+            data.medium.maxWaitTimeEstimate / 1000
+          } sec`,
+          maxFee: `${(
+            parseFloat(data.medium.suggestedMaxFeePerGas) / 1e9
+          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          priorityFee: `${(
+            parseFloat(data.medium.suggestedMaxPriorityFeePerGas) / 1e9
+          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          network: transactionData?.network.name,
+          icon: "🦊",
+        },
+        {
+          type: "Aggressive",
+          time: `${data.high.minWaitTimeEstimate / 1000} - ${
+            data.high.maxWaitTimeEstimate / 1000
+          } sec`,
+          maxFee: `${(
+            parseFloat(data.high.suggestedMaxFeePerGas) / 1e9
+          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          priorityFee: `${(
+            parseFloat(data.high.suggestedMaxPriorityFeePerGas) / 1e9
+          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          network: transactionData?.network.name,
+          icon: "🐎",
+        },
+      ];
+
+      setGasOptions(options);
+
+      setNetworkStatus({
+        baseFee: `${data.estimatedBaseFee} GWEI`,
+        congestion: `${(data.networkCongestion * 100).toFixed(1)}%`,
+        status: data.priorityFeeTrend === "down" ? "Stable" : "Increasing",
+      });
+    } catch (error) {
+      console.error("Error fetching gas fee data:", error);
+    } finally {
+      setTimeout(() => setAnimation(false), 3000); // Stop animation regardless of success or failure
+    }
+  };
 
   useEffect(() => {
-    const fetchGasFees = async () => {
-      if (!transactionData?.network.chainId) return;
+    // Only fetch when the modal is open
 
-      try {
-        const response = await axios.get(
-          `https://gas.api.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9/networks/${transactionData.network.chainId}/suggestedGasFees`
-        );
+    fetchGasFees(); // Fetch immediately on open
 
-        const data = response.data;
+    const intervalId = setInterval(() => {
+      fetchGasFees();
+    }, 12000); // Fetch every 12 seconds
 
-        // Map API response to UI-compatible data structure
-        const options = [
-          {
-            type: "Low",
-            time: `${data.low.minWaitTimeEstimate / 1000} - ${
-              data.low.maxWaitTimeEstimate / 1000
-            } sec`,
-            maxFee: `${(
-              parseFloat(data.low.suggestedMaxFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`, // Convert to native balance
-            priorityFee: `${(
-              parseFloat(data.low.suggestedMaxPriorityFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
-            network: transactionData?.network.name,
-            icon: "🐢",
-          },
-          {
-            type: "Market",
-            time: `${data.medium.minWaitTimeEstimate / 1000} - ${
-              data.medium.maxWaitTimeEstimate / 1000
-            } sec`,
-            maxFee: `${(
-              parseFloat(data.medium.suggestedMaxFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
-            priorityFee: `${(
-              parseFloat(data.medium.suggestedMaxPriorityFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
-            network: transactionData?.network.name,
-            icon: "🦊",
-          },
-          {
-            type: "Aggressive",
-            time: `${data.high.minWaitTimeEstimate / 1000} - ${
-              data.high.maxWaitTimeEstimate / 1000
-            } sec`,
-            maxFee: `${(
-              parseFloat(data.high.suggestedMaxFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
-            priorityFee: `${(
-              parseFloat(data.high.suggestedMaxPriorityFeePerGas) / 1e9
-            ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
-            network: transactionData?.network.name,
-            icon: "🐎",
-          },
-        ];
-
-        setGasOptions(options);
-
-        setNetworkStatus({
-          baseFee: `${data.estimatedBaseFee} GWEI`,
-          congestion: `${(data.networkCongestion * 100).toFixed(1)}%`,
-          status: data.priorityFeeTrend === "down" ? "Stable" : "Increasing",
-        });
-      } catch (error) {
-        console.error("Error fetching gas fee data:", error);
-      }
-    };
-
-    if (open) fetchGasFees();
-  }, [open, transactionData]);
+    return () => clearInterval(intervalId); // Cleanup interval on unmount or close
+  }, [transactionData]);
 
   return (
     <>
@@ -115,6 +133,10 @@ const EditGasEstimation = ({ open, setOpen, transactionData }) => {
                   gasOptions={gasOptions}
                   networkStatus={networkStatus}
                   setAdvancedGasFee={setAdvancedGasFee}
+                  setSelectedGasFee={setSelectedGasFee}
+                  selectedGasFee={selectedGasFee}
+                  setOpen={setOpen}
+                  animation={animation}
                 />
               )}
             </DialogPanel>

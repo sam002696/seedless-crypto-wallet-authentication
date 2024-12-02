@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import TransactionDetails from "./DisplayTab/TransactionDetails";
 import TransactionHex from "./DisplayTab/TransactionHex";
+import { useHistory } from "react-router-dom";
 
 const DisplayTransaction = ({ transactionData }) => {
+  const history = useHistory();
   const walletTransactionInfo = ["Details", "HEX"];
   const [walletTransaction, setWalletTransaction] = useState("Details");
 
@@ -17,6 +19,11 @@ const DisplayTransaction = ({ transactionData }) => {
       default:
         return null;
     }
+  };
+
+  const handleRejectTransaction = () => {
+    history.push("/wallet");
+    localStorage.removeItem("selectedGasFeeType");
   };
 
   return (
@@ -42,7 +49,10 @@ const DisplayTransaction = ({ transactionData }) => {
       <div className="mt-4 px-3">{displayTabContent()}</div>
 
       <div className="flex justify-between items-center mt-6 px-4">
-        <button className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300">
+        <button
+          onClick={handleRejectTransaction}
+          className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300"
+        >
           Reject
         </button>
         <button
