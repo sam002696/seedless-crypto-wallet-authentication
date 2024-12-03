@@ -12,6 +12,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.8",
+    "bn.js": "^5.2.1",
     "formik": "^2.4.6",
     "heroicons": "^2.1.5",
     "js-cookie": "^3.0.5",
