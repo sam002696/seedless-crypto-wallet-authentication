@@ -1,18 +1,16 @@
+/* eslint-disable no-undef */
 import React, { useState } from "react";
 import TransactionDetails from "./DisplayTab/TransactionDetails";
 import TransactionHex from "./DisplayTab/TransactionHex";
 import { useHistory } from "react-router-dom";
 import Web3 from "web3";
 import { AuthUser } from "../../../helpers/AuthUser";
-import BN from "bn.js";
+import { Network } from "../../../helpers/Network";
 
 const DisplayTransaction = ({ transactionData }) => {
   const history = useHistory();
   const walletTransactionInfo = ["Details", "HEX"];
   const [walletTransaction, setWalletTransaction] = useState("Details");
-  const [transactionHex, setTransactionHex] = useState(null); // State for transaction hash
-  const [gasUsed, setGasUsed] = useState(null); // State for gas used
-  const [transactionFee, setTransactionFee] = useState(null); // State for transaction fee
 
   const handleRejectTransaction = () => {
     history.push("/wallet");
@@ -21,62 +19,75 @@ const DisplayTransaction = ({ transactionData }) => {
 
   const confirmCryptoTransaction = async () => {
     try {
-      const { sender, receiver, transactionDetails, network } = transactionData;
-      const { address: fromAddress } = sender;
-      const { address: toAddress } = receiver;
-      const { tokenAddress, amount } = transactionDetails;
-      const { chainId } = network;
+      const web3 = new Web3(Network.getNetworkRpcUrl()); // Use your Infura/Alchemy endpoint
+      const privateKey = AuthUser.getPrivateKey(); // Sender's private key
+      const senderAddress = transactionData.sender.address;
+      const receiverAddress = transactionData.receiver.address;
+      const { tokenAddress, amount } = transactionData.transactionDetails;
 
-      const rpcUrls = {
-        1: "https://mainnet.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9", // Ethereum Mainnet
-        11155111:
-          "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9", // Sepolia Testnet
-      };
+      // Fetch the current nonce for the sender's address
+      const nonce = await web3.eth.getTransactionCount(
+        senderAddress,
+        "pending"
+      );
 
-      const web3 = new Web3(rpcUrls[chainId]);
+      // Fetch the current gas price and priority fees
+      const feeData = await web3.eth.getFeeHistory(1, "latest", [25, 75]);
+      const maxPriorityFeePerGas = web3.utils.toWei("2", "gwei"); // Example priority fee
 
-      let txHash;
-      let gasUsedValue;
-      let transactionFeeValue;
-      const privateKey = AuthUser.getPrivateKey(); // Ensure this retrieves the private key correctly
+      console.log("maxPriorityFeePerGas", maxPriorityFeePerGas);
 
+      const maxFeePerGas = (
+        BigInt(feeData.baseFeePerGas[0]) + BigInt(maxPriorityFeePerGas)
+      ).toString(); // Ensure it's a string
+
+      console.log("maxFeePerGas", maxFeePerGas);
+
+      // Check if the transaction is a token transfer or native transfer
       if (tokenAddress) {
-        // ERC20 Token Transfer
-        const erc20Abi = [
-          {
-            constant: false,
-            inputs: [
-              { name: "_to", type: "address" },
-              { name: "_value", type: "uint256" },
-            ],
-            name: "transfer",
-            outputs: [{ name: "", type: "bool" }],
-            type: "function",
-          },
-        ];
+        // Token transfer logic
+        const tokenContract = new web3.eth.Contract(
+          [
+            {
+              constant: false,
+              inputs: [
+                { name: "_to", type: "address" },
+                { name: "_value", type: "uint256" },
+              ],
+              name: "transfer",
+              outputs: [{ name: "", type: "bool" }],
+              type: "function",
+            },
+          ],
+          tokenAddress
+        );
 
-        const contract = new web3.eth.Contract(erc20Abi, tokenAddress);
-        const decimals = 18; // Adjust based on token decimals
-        const value = new BN(amount).mul(new BN(10).pow(new BN(decimals))); // Use BN for big numbers
+        const data = tokenContract.methods
+          .transfer(
+            receiverAddress,
+            web3.utils.toWei(amount.toString(), "ether") // Convert amount to Wei
+          )
+          .encodeABI();
 
-        const data = contract.methods
-          .transfer(toAddress, value.toString())
-          .encodeABI(); // Ensure value is passed as a string
-
-        const gasPrice = await web3.eth.getGasPrice();
         const gasEstimate = await web3.eth.estimateGas({
-          from: fromAddress,
           to: tokenAddress,
           data,
+          from: senderAddress,
         });
 
+        console.log("gasEstimate", web3.utils.toHex(Number(gasEstimate)));
+
+        console.log("gasEstimate", web3.utils.toHex(gasEstimate));
+
         const tx = {
-          from: fromAddress,
           to: tokenAddress,
           data,
-          gas: gasEstimate,
-          gasPrice,
-          chainId,
+          gas: web3.utils.toHex(gasEstimate),
+          nonce,
+          chainId: transactionData.network.chainId,
+          from: senderAddress,
+          maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
+          maxFeePerGas: web3.utils.toHex(maxFeePerGas),
         };
 
         const signedTx = await web3.eth.accounts.signTransaction(
@@ -84,78 +95,77 @@ const DisplayTransaction = ({ transactionData }) => {
           privateKey
         );
 
-        const receipt = await web3.eth.sendSignedTransaction(
-          signedTx.rawTransaction
-        );
+        console.log("signedTx", signedTx);
 
-        txHash = receipt.transactionHash;
-        gasUsedValue = receipt.gasUsed;
-        transactionFeeValue = web3.utils.fromWei(
-          new BN(gasUsedValue).mul(new BN(gasPrice)),
-          "ether"
-        );
+        const receipt = await web3.eth
+          .sendSignedTransaction(signedTx?.rawTransaction)
+          .on("transactionHash", (hash) => {
+            console.log("Transaction Hash:", hash);
+          })
+          .on("receipt", (receipt) => {
+            console.log("Transaction Receipt:", receipt);
+          })
+          .on("confirmation", (confirmationNumber, receipt) => {
+            console.log(
+              "Confirmation Number:",
+              confirmationNumber,
+              "Receipt:",
+              receipt
+            );
+          })
+          .on("error", (error) => {
+            console.error("Error during transaction broadcast:", error);
+          });
+
+        console.log("Token transfer successful:", receipt);
       } else {
-        // Native Token Transfer
-        const value = web3.utils.toWei(amount.toString(), "ether");
+        // Native transfer logic
+        const value = web3.utils.toWei(amount.toString(), "ether"); // Convert amount to Wei
 
-        const gasPrice = await web3.eth.getGasPrice();
         const gasEstimate = await web3.eth.estimateGas({
-          from: fromAddress,
-          to: toAddress,
+          to: receiverAddress,
           value,
+          from: senderAddress,
         });
 
+        console.log("gasEstimate", gasEstimate);
+
         const tx = {
-          from: fromAddress,
-          to: toAddress,
-          value,
-          gas: gasEstimate,
-          gasPrice,
-          chainId,
+          to: receiverAddress,
+          value: web3.utils.toHex(value), // Ensure value is in hex
+          gas: web3.utils.toHex(gasEstimate),
+          nonce,
+          chainId: transactionData.network.chainId,
+          from: senderAddress,
+          maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
+          maxFeePerGas: web3.utils.toHex(maxFeePerGas),
         };
 
         const signedTx = await web3.eth.accounts.signTransaction(
           tx,
           privateKey
         );
-
         const receipt = await web3.eth.sendSignedTransaction(
           signedTx.rawTransaction
         );
 
-        txHash = receipt.transactionHash;
-        gasUsedValue = receipt.gasUsed;
-        transactionFeeValue = web3.utils.fromWei(
-          new BN(gasUsedValue).mul(new BN(gasPrice)),
-          "ether"
-        );
+        console.log("Native transfer successful:", receipt);
       }
 
-      // Update State with Transaction Details
-      setTransactionHex(txHash);
-      setGasUsed(gasUsedValue);
-      setTransactionFee(transactionFeeValue);
-
-      // Switch to HEX tab to display the transaction hash
-      setWalletTransaction("HEX");
+      // Navigate to wallet or show success notification
+      history.push("/wallet");
     } catch (error) {
-      console.error("Transaction Failed:", error.message);
-      alert("Transaction Failed: " + error.message);
+      console.error("Transaction failed:", error);
+      alert("Transaction failed: " + error.message);
     }
   };
 
   const displayTabContent = () => {
     switch (walletTransaction) {
       case "Details":
-        return (
-          <TransactionDetails
-            transactionData={transactionData}
-            gasUsed={gasUsed}
-            transactionFee={transactionFee}
-          />
-        );
+        return <TransactionDetails transactionData={transactionData} />;
       case "HEX":
-        return <TransactionHex transactionHex={transactionHex} />;
+        return <TransactionHex transactionData={transactionData} />;
       default:
         return null;
     }
