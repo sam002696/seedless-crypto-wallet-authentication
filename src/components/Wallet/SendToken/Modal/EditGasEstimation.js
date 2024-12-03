@@ -34,9 +34,8 @@ const EditGasEstimation = ({
           time: `${data.low.minWaitTimeEstimate / 1000} - ${
             data.low.maxWaitTimeEstimate / 1000
           } sec`,
-          maxFee: `${(parseFloat(data.low.suggestedMaxFeePerGas) / 1e9).toFixed(
-            8
-          )} ${transactionData?.network.nativeCurrency || "ETH"}`,
+          maxFee: `${((parseFloat(data.low.suggestedMaxFeePerGas) / 1e9) * 1.05) // Increase by 5%
+            .toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
           priorityFee: `${(
             parseFloat(data.low.suggestedMaxPriorityFeePerGas) / 1e9
           ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
@@ -49,8 +48,10 @@ const EditGasEstimation = ({
             data.medium.maxWaitTimeEstimate / 1000
           } sec`,
           maxFee: `${(
-            parseFloat(data.medium.suggestedMaxFeePerGas) / 1e9
-          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+            (parseFloat(data.medium.suggestedMaxFeePerGas) / 1e9) *
+            1.05
+          ) // Increase by 5%
+            .toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
           priorityFee: `${(
             parseFloat(data.medium.suggestedMaxPriorityFeePerGas) / 1e9
           ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
@@ -63,8 +64,10 @@ const EditGasEstimation = ({
             data.high.maxWaitTimeEstimate / 1000
           } sec`,
           maxFee: `${(
-            parseFloat(data.high.suggestedMaxFeePerGas) / 1e9
-          ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
+            (parseFloat(data.high.suggestedMaxFeePerGas) / 1e9) *
+            1.05
+          ) // Increase by 5%
+            .toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,
           priorityFee: `${(
             parseFloat(data.high.suggestedMaxPriorityFeePerGas) / 1e9
           ).toFixed(8)} ${transactionData?.network.nativeCurrency || "ETH"}`,

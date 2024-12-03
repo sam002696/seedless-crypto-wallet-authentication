@@ -102,7 +102,7 @@ const TransactionDetails = ({ transactionData }) => {
               {/* Display the selected gas fee's time */}
               <p className="text-xl">
                 {gasMarket
-                  ? ` ${gasMarket.icon} ${gasMarket.type} - (${gasMarket.time})`
+                  ? ` ${gasMarket.icon} ${gasMarket.type}  (${gasMarket.time})`
                   : "loading"}
               </p>
             </div>
