@@ -19,33 +19,40 @@ const DisplayTransaction = ({ transactionData }) => {
 
   const confirmCryptoTransaction = async () => {
     try {
-      const web3 = new Web3(Network.getNetworkRpcUrl()); // Use your Infura/Alchemy endpoint
-      const privateKey = AuthUser.getPrivateKey(); // Sender's private key
+      const web3 = new Web3(Network.getNetworkRpcUrl());
+      const privateKey = AuthUser.getPrivateKey();
       const senderAddress = transactionData.sender.address;
       const receiverAddress = transactionData.receiver.address;
       const { tokenAddress, amount } = transactionData.transactionDetails;
 
-      // Fetch the current nonce for the sender's address
+      console.log("Starting transaction process...");
+      console.log("Sender Address:", senderAddress);
+      console.log("Receiver Address:", receiverAddress);
+
+      // Fetch nonce
       const nonce = await web3.eth.getTransactionCount(
         senderAddress,
         "pending"
       );
+      console.log("Nonce:", nonce);
 
-      // Fetch the current gas price and priority fees
+      // Fetch gas fees
       const feeData = await web3.eth.getFeeHistory(1, "latest", [25, 75]);
-      const maxPriorityFeePerGas = web3.utils.toWei("2", "gwei"); // Example priority fee
+      const baseFeePerGas = BigInt(feeData.baseFeePerGas[0]);
+      const maxPriorityFeePerGas = BigInt(web3.utils.toWei("0.5", "gwei")); // 0.5 Gwei
+      const maxFeePerGas = (baseFeePerGas + maxPriorityFeePerGas).toString();
 
-      console.log("maxPriorityFeePerGas", maxPriorityFeePerGas);
+      console.log("Base Fee Per Gas (Wei):", baseFeePerGas.toString());
+      console.log(
+        "Max Priority Fee Per Gas (Wei):",
+        maxPriorityFeePerGas.toString()
+      );
+      console.log("Max Fee Per Gas (Wei):", maxFeePerGas);
 
-      const maxFeePerGas = (
-        BigInt(feeData.baseFeePerGas[0]) + BigInt(maxPriorityFeePerGas)
-      ).toString(); // Ensure it's a string
-
-      console.log("maxFeePerGas", maxFeePerGas);
-
-      // Check if the transaction is a token transfer or native transfer
+      // Token Transfer
       if (tokenAddress) {
-        // Token transfer logic
+        console.log("Token Transfer Detected");
+
         const tokenContract = new web3.eth.Contract(
           [
             {
@@ -65,97 +72,91 @@ const DisplayTransaction = ({ transactionData }) => {
         const data = tokenContract.methods
           .transfer(
             receiverAddress,
-            web3.utils.toWei(amount.toString(), "ether") // Convert amount to Wei
+            web3.utils.toWei(amount.toString(), "ether")
           )
           .encodeABI();
+        console.log("Encoded ABI Data:", data);
 
         const gasEstimate = await web3.eth.estimateGas({
           to: tokenAddress,
           data,
           from: senderAddress,
         });
+        const adjustedGasEstimate = Math.ceil(Number(gasEstimate) * 1.1); // Add 10% buffer
+        console.log("Gas Estimate (with Buffer):", adjustedGasEstimate);
 
-        console.log("gasEstimate", web3.utils.toHex(Number(gasEstimate)));
+        const transactionFeeWei =
+          BigInt(adjustedGasEstimate) * BigInt(maxFeePerGas);
+        const transactionFeeEth = web3.utils.fromWei(
+          transactionFeeWei.toString(),
+          "ether"
+        );
 
-        console.log("gasEstimate", web3.utils.toHex(gasEstimate));
+        console.log("Transaction Fee in Wei:", transactionFeeWei.toString());
+        console.log("Transaction Fee in ETH:", transactionFeeEth);
+
+        if (parseFloat(transactionFeeEth) > 1) {
+          throw new Error(
+            `Transaction fee (${transactionFeeEth} ETH) exceeds the 1 ETH cap.`
+          );
+        }
+
+        // const tx = {
+        //   to: tokenAddress,
+        //   data,
+        //   gas: 21644,
+        //   nonce,
+        //   chainId: transactionData.network.chainId,
+        //   from: senderAddress,
+        //   maxPriorityFeePerGas: 1, // 1 Wei
+        //   maxFeePerGas: 20, // 20 Wei
+        // };
 
         const tx = {
-          to: tokenAddress,
-          data,
-          gas: web3.utils.toHex(gasEstimate),
-          nonce,
-          chainId: transactionData.network.chainId,
-          from: senderAddress,
-          maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
-          maxFeePerGas: web3.utils.toHex(maxFeePerGas),
+          nonce: web3.utils.toHex(nonce), // Nonce in hex
+          gasPrice: 20, // Gas price in hex
+          gasLimit: 21644, // Gas limit in hex
+          to: tokenAddress, // The recipient address
+          value: "0x0", // No ETH transfer, just a token transfer
+          data: data, // Encoded ABI data for the transfer
+          chainId: transactionData.network.chainId, // Network chain ID
         };
+
+        console.log("Transaction Object:", tx);
 
         const signedTx = await web3.eth.accounts.signTransaction(
           tx,
           privateKey
         );
+        console.log("Signed Transaction:", signedTx);
 
-        console.log("signedTx", signedTx);
-
-        const receipt = await web3.eth
-          .sendSignedTransaction(signedTx?.rawTransaction)
-          .on("transactionHash", (hash) => {
-            console.log("Transaction Hash:", hash);
-          })
-          .on("receipt", (receipt) => {
-            console.log("Transaction Receipt:", receipt);
-          })
-          .on("confirmation", (confirmationNumber, receipt) => {
-            console.log(
-              "Confirmation Number:",
-              confirmationNumber,
-              "Receipt:",
-              receipt
-            );
-          })
-          .on("error", (error) => {
-            console.error("Error during transaction broadcast:", error);
-          });
-
-        console.log("Token transfer successful:", receipt);
-      } else {
-        // Native transfer logic
-        const value = web3.utils.toWei(amount.toString(), "ether"); // Convert amount to Wei
-
-        const gasEstimate = await web3.eth.estimateGas({
-          to: receiverAddress,
-          value,
-          from: senderAddress,
-        });
-
-        console.log("gasEstimate", gasEstimate);
-
-        const tx = {
-          to: receiverAddress,
-          value: web3.utils.toHex(value), // Ensure value is in hex
-          gas: web3.utils.toHex(gasEstimate),
-          nonce,
-          chainId: transactionData.network.chainId,
-          from: senderAddress,
-          maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
-          maxFeePerGas: web3.utils.toHex(maxFeePerGas),
-        };
-
-        const signedTx = await web3.eth.accounts.signTransaction(
-          tx,
-          privateKey
-        );
-        const receipt = await web3.eth.sendSignedTransaction(
+        const promiEvent = web3.eth.sendSignedTransaction(
           signedTx.rawTransaction
         );
 
-        console.log("Native transfer successful:", receipt);
+        promiEvent
+          .on("transactionHash", (hash) => {
+            console.log("Transaction Hash:", hash);
+            alert("Transaction sent successfully! Transaction Hash: " + hash);
+          })
+          .on("receipt", (receipt) => {
+            console.log("Transaction Receipt:", receipt);
+            alert("Transaction confirmed! Receipt: " + JSON.stringify(receipt));
+          })
+          .on("confirmation", (confirmationNumber, receipt) => {
+            console.log(
+              `Confirmation ${confirmationNumber}:`,
+              JSON.stringify(receipt)
+            );
+          })
+          .on("error", (error) => {
+            console.error("Transaction Error:", error);
+            alert("Transaction failed: " + error.message);
+          });
+        // console.log("Transaction Receipt:", receipt);
       }
-
-      // Navigate to wallet or show success notification
-      history.push("/wallet");
     } catch (error) {
-      console.error("Transaction failed:", error);
+      console.error("Transaction Failed:", error);
       alert("Transaction failed: " + error.message);
     }
   };
@@ -173,7 +174,7 @@ const DisplayTransaction = ({ transactionData }) => {
 
   return (
     <div className="flex flex-col min-h-screen ">
-      {/* Tabs Display Start */}
+      {/* Tabs Display */}
       <div className="flex flex-row justify-between mt-5">
         {walletTransactionInfo.map((item) => (
           <button
@@ -190,9 +191,10 @@ const DisplayTransaction = ({ transactionData }) => {
         ))}
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       <div className="mt-4 px-3">{displayTabContent()}</div>
 
+      {/* Action Buttons */}
       <div className="flex justify-between items-center mt-6 px-4">
         <button
           onClick={handleRejectTransaction}
