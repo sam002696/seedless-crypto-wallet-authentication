@@ -20,6 +20,10 @@ const DisplayTransaction = ({ transactionData }) => {
   const confirmCryptoTransaction = async () => {
     try {
       const web3 = new Web3(Network.getNetworkRpcUrl());
+
+      const suggestedMaxPriorityFeePerGas = web3.utils.toWei("2", "gwei"); // From API: 2 Gwei
+      const suggestedMaxFeePerGas = web3.utils.toWei("112.51334916", "gwei"); // From API: 112.51334916 Gwei
+
       const privateKey = AuthUser.getPrivateKey();
       const senderAddress = transactionData.sender.address;
       const receiverAddress = transactionData.receiver.address;
@@ -28,6 +32,12 @@ const DisplayTransaction = ({ transactionData }) => {
       console.log("Starting transaction process...");
       console.log("Sender Address:", senderAddress);
       console.log("Receiver Address:", receiverAddress);
+
+      const pendingTransactions = await web3.eth.getTransactionCount(
+        senderAddress,
+        "pending"
+      );
+      console.log("Pending Transactions:", pendingTransactions);
 
       // Fetch nonce
       const nonce = await web3.eth.getTransactionCount(
@@ -101,25 +111,70 @@ const DisplayTransaction = ({ transactionData }) => {
           );
         }
 
-        // const tx = {
-        //   to: tokenAddress,
-        //   data,
-        //   gas: 21644,
-        //   nonce,
-        //   chainId: transactionData.network.chainId,
-        //   from: senderAddress,
-        //   maxPriorityFeePerGas: 1, // 1 Wei
-        //   maxFeePerGas: 20, // 20 Wei
-        // };
+        // Simulate transaction using web3.eth.call
+        console.log("Simulating transaction...");
+        try {
+          const simulationResult = await web3.eth.call({
+            from: senderAddress,
+            to: tokenAddress,
+            data: data,
+          });
+          console.log("Simulation Result:", simulationResult);
+        } catch (simulationError) {
+          console.error(
+            "Transaction Simulation Failed:",
+            simulationError.message
+          );
+          throw new Error(
+            "Simulation failed: The transaction would likely revert. Details: " +
+              simulationError.message
+          );
+        }
+
+        const gasEstimateLater = await web3.eth.estimateGas({
+          from: senderAddress,
+          to: tokenAddress,
+          data: data,
+        });
+        const adjustedGasLimit = Math.ceil(Number(gasEstimateLater) * 1.2); // Add 20% buffer
+
+        const gasPrice = await web3.eth.getGasPrice(); // Fetch current gas price
+        console.log("gasPrice", gasPrice);
+        const bufferedGasPrice =
+          BigInt(gasPrice) + BigInt(web3.utils.toWei("20", "gwei")); // Add 10 Gwei buffer
+
+        const pendingNonce = await web3.eth.getTransactionCount(
+          senderAddress,
+          "pending"
+        );
+        if (pendingNonce > nonce) {
+          console.log(
+            "Pending transactions detected. Replacing with a higher gas price..."
+          );
+          const cancelTx = {
+            nonce: web3.utils.toHex(nonce),
+            gasPrice: web3.utils.toHex(bufferedGasPrice),
+            gasLimit: web3.utils.toHex(21000), // Standard gas limit for ETH transfer
+            to: senderAddress, // Self-transfer
+            value: "0x0", // No ETH transfer
+            chainId: web3.utils.toHex(transactionData.network.chainId),
+          };
+
+          const signedCancelTx = await web3.eth.accounts.signTransaction(
+            cancelTx,
+            privateKey
+          );
+          await web3.eth.sendSignedTransaction(signedCancelTx.rawTransaction);
+        }
 
         const tx = {
-          nonce: web3.utils.toHex(nonce), // Nonce in hex
-          gasPrice: 20, // Gas price in hex
-          gasLimit: 21644, // Gas limit in hex
-          to: tokenAddress, // The recipient address
-          value: "0x0", // No ETH transfer, just a token transfer
-          data: data, // Encoded ABI data for the transfer
-          chainId: transactionData.network.chainId, // Network chain ID
+          nonce: web3.utils.toHex(nonce),
+          gasPrice: web3.utils.toHex(bufferedGasPrice),
+
+          gasLimit: web3.utils.toHex(adjustedGasLimit),
+          to: tokenAddress,
+          data: data,
+          chainId: web3.utils.toHex(transactionData.network.chainId),
         };
 
         console.log("Transaction Object:", tx);
@@ -153,13 +208,141 @@ const DisplayTransaction = ({ transactionData }) => {
             console.error("Transaction Error:", error);
             alert("Transaction failed: " + error.message);
           });
-        // console.log("Transaction Receipt:", receipt);
       }
     } catch (error) {
       console.error("Transaction Failed:", error);
       alert("Transaction failed: " + error.message);
     }
   };
+
+  //   try {
+  //     const web3 = new Web3(Network.getNetworkRpcUrl());
+  //     const privateKey = AuthUser.getPrivateKey();
+  //     const senderAddress = transactionData.sender.address;
+  //     const receiverAddress = transactionData.receiver.address;
+  //     const { tokenAddress, amount } = transactionData.transactionDetails;
+
+  //     console.log("Starting transaction process...");
+  //     console.log("Sender Address:", senderAddress);
+  //     console.log("Receiver Address:", receiverAddress);
+
+  //     // Fetch nonce
+  //     const nonce = await web3.eth.getTransactionCount(
+  //       senderAddress,
+  //       "pending"
+  //     );
+  //     console.log("Nonce:", nonce);
+
+  //     // Fetch gas price
+  //     const gasPrice = await web3.eth.getGasPrice();
+  //     console.log("Gas Price (Wei):", gasPrice);
+
+  //     // Token Transfer
+  //     if (tokenAddress) {
+  //       console.log("Token Transfer Detected");
+
+  //       const tokenContract = new web3.eth.Contract(
+  //         [
+  //           {
+  //             constant: false,
+  //             inputs: [
+  //               { name: "_to", type: "address" },
+  //               { name: "_value", type: "uint256" },
+  //             ],
+  //             name: "transfer",
+  //             outputs: [{ name: "", type: "bool" }],
+  //             type: "function",
+  //           },
+  //         ],
+  //         tokenAddress
+  //       );
+
+  //       const data = tokenContract.methods
+  //         .transfer(
+  //           receiverAddress,
+  //           web3.utils.toWei(amount.toString(), "ether")
+  //         )
+  //         .encodeABI();
+  //       console.log("Encoded ABI Data:", data);
+
+  //       // Estimate gas
+  //       const gasEstimate = await web3.eth.estimateGas({
+  //         to: tokenAddress,
+  //         data,
+  //         from: senderAddress,
+  //       });
+  //       const gasLimit = Math.ceil(gasEstimate * 1.1); // Add 10% buffer
+  //       console.log("Gas Estimate (with Buffer):", gasLimit);
+
+  //       // Ensure the sender has enough ETH for gas
+  //       const transactionCost = BigInt(gasLimit) * BigInt(gasPrice);
+  //       const senderBalance = BigInt(await web3.eth.getBalance(senderAddress));
+  //       if (senderBalance < transactionCost) {
+  //         throw new Error(
+  //           `Insufficient funds: Balance (${web3.utils.fromWei(
+  //             senderBalance.toString(),
+  //             "ether"
+  //           )} ETH) is less than transaction cost (${web3.utils.fromWei(
+  //             transactionCost.toString(),
+  //             "ether"
+  //           )} ETH).`
+  //         );
+  //       }
+
+  //       // Construct the transaction
+  //       const tx = {
+  //         nonce: web3.utils.toHex(nonce),
+  //         gasPrice: web3.utils.toHex(gasPrice),
+  //         gasLimit: web3.utils.toHex(gasLimit),
+  //         to: tokenAddress,
+  //         data: data,
+  //         chainId: transactionData.network.chainId,
+  //       };
+
+  //       console.log("Transaction Object:", tx);
+
+  //       // Sign the transaction
+  //       const signedTx = await web3.eth.accounts.signTransaction(
+  //         tx,
+  //         privateKey
+  //       );
+  //       console.log("Signed Transaction:", signedTx);
+
+  //       // Broadcast the transaction
+  //       const receipt = await new Promise((resolve, reject) => {
+  //         web3.eth
+  //           .sendSignedTransaction(signedTx.rawTransaction)
+  //           .on("transactionHash", (hash) => {
+  //             console.log("Transaction Hash:", hash);
+  //           })
+  //           .on("receipt", (receipt) => {
+  //             console.log("Transaction Receipt:", receipt);
+  //             resolve(receipt);
+  //           })
+  //           .on("confirmation", (confirmationNumber, receipt) => {
+  //             console.log(
+  //               `Confirmation ${confirmationNumber}:`,
+  //               JSON.stringify(receipt)
+  //             );
+  //           })
+  //           .on("error", (error) => {
+  //             console.error("Transaction Error:", error);
+  //             reject(error);
+  //           });
+  //       });
+
+  //       console.log("Transaction Mined Successfully:", receipt);
+  //       alert("Transaction confirmed! Receipt: " + JSON.stringify(receipt));
+  //       return receipt;
+  //     } else {
+  //       throw new Error("Token address is required for this transaction.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Transaction Failed:", error);
+  //     alert("Transaction failed: " + error.message);
+  //     throw error;
+  //   }
+  // };
 
   const displayTabContent = () => {
     switch (walletTransaction) {
