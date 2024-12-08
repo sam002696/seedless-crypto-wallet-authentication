@@ -6,14 +6,6 @@ import { useHistory } from "react-router-dom";
 import Web3 from "web3";
 import { AuthUser } from "../../../helpers/AuthUser";
 import { Network } from "../../../helpers/Network";
-import {
-  JsonRpcProvider,
-  Wallet,
-  parseUnits,
-  formatUnits,
-  toBeHex,
-} from "ethers";
-import { FlashbotsBundleProvider } from "@flashbots/ethers-provider-bundle";
 
 const DisplayTransaction = ({ transactionData }) => {
   const web3 = new Web3(Network.getNetworkRpcUrl());
