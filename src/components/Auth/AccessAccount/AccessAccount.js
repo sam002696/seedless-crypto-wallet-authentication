@@ -40,7 +40,7 @@ const AccessAccount = () => {
   console.log("loginVerify", loginVerify);
   // Safely check if accessToken exists before redirecting
   if (loginVerify?.data?.accessToken) {
-    return <Redirect to="/user-account" />;
+    return <Redirect to="/wallet" />;
   }
 
   console.log("loginVerify", loginVerify);
