@@ -382,14 +382,14 @@ const DisplayTransaction = ({ transactionData }) => {
           })
           .on("receipt", (receipt) => {
             console.log("Transaction Receipt:", receipt);
-            alert("Transaction confirmed! Receipt: " + JSON.stringify(receipt));
+            alert("Transaction confirmed!");
           })
-          .on("confirmation", (confirmationNumber, receipt) => {
-            console.log(
-              `Confirmation ${confirmationNumber}:`,
-              JSON.stringify(receipt)
-            );
-          })
+          // .on("confirmation", (confirmationNumber, receipt) => {
+          //   console.log(
+          //     `Confirmation ${confirmationNumber}:`,
+          //     JSON.stringify(receipt)
+          //   );
+          // })
           .on("error", (error) => {
             console.error("Transaction Error:", error);
             alert("Transaction failed: " + error.message);
