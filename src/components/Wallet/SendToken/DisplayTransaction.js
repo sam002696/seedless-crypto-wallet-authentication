@@ -50,7 +50,7 @@ const DisplayTransaction = ({ transactionData }) => {
       console.log("Gas Fees Response:", gasFees);
 
       // Select priority level (low, medium, high)
-      const priorityLevel = "high"; // Choose "low", "medium", or "high"
+      const priorityLevel = "medium"; // Choose "low", "medium", or "high"
       const suggestedGasFees = gasFees[priorityLevel];
 
       const maxPriorityFeePerGas = BigInt(
