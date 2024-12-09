@@ -97,7 +97,7 @@ const EditGasEstimation = ({
 
     const intervalId = setInterval(() => {
       fetchGasFees();
-    }, 12000); // Fetch every 12 seconds
+    }, 1200000); // Fetch every 12 seconds
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount or close
   }, [transactionData]);
