@@ -8,6 +8,7 @@ import { AuthUser } from "../../../helpers/AuthUser";
 import { Network } from "../../../helpers/Network";
 
 const DisplayTransaction = ({ transactionData }) => {
+  const savedGasType = localStorage.getItem("selectedGasFeeType");
   const web3 = new Web3(Network.getNetworkRpcUrl());
   const history = useHistory();
   const walletTransactionInfo = ["Details", "HEX"];
@@ -20,11 +21,32 @@ const DisplayTransaction = ({ transactionData }) => {
     localStorage.removeItem("selectedGasFeeType");
   };
 
+  const checkPriorityLevel = (item) => {
+    if (!item) {
+      console.warn("Invalid savedGasType; defaulting to 'medium'.");
+      return "medium"; // Default priority level
+    }
+
+    switch (item) {
+      case "market":
+        return "medium";
+      case "agressive":
+        return "high";
+      case "low":
+        return "low";
+      default:
+        console.warn(
+          `Unknown priority level: ${item}; defaulting to 'medium'.`
+        );
+        return "medium";
+    }
+  };
+
+  console.log("savedGasType", savedGasType);
+
   const confirmTransaction = async () => {
     try {
       setLoading(true);
-      // const web3 = new Web3(Network.getNetworkRpcUrl());
-
       const privateKey = AuthUser.getPrivateKey();
       const senderAddress = transactionData.sender.address;
       const receiverAddress = transactionData.receiver.address;
@@ -35,10 +57,7 @@ const DisplayTransaction = ({ transactionData }) => {
       console.log("Receiver Address:", receiverAddress);
 
       // Fetch nonce
-      const nonce = await web3.eth.getTransactionCount(
-        senderAddress,
-        "pending"
-      );
+      const nonce = await web3.eth.getTransactionCount(senderAddress, "latest");
       console.log("Nonce:", nonce);
 
       // Fetch gas fees from Infura
@@ -49,8 +68,10 @@ const DisplayTransaction = ({ transactionData }) => {
 
       console.log("Gas Fees Response:", gasFees);
 
-      // Select priority level (low, medium, high)
-      const priorityLevel = "medium"; // Choose "low", "medium", or "high"
+      const priorityLevel = checkPriorityLevel(savedGasType?.toLowerCase());
+
+      console.log("priorityLevel", priorityLevel);
+
       const suggestedGasFees = gasFees[priorityLevel];
 
       const maxPriorityFeePerGas = BigInt(
@@ -76,24 +97,44 @@ const DisplayTransaction = ({ transactionData }) => {
       );
       if (pendingNonce > nonce) {
         console.log(
-          "Pending transactions detected. Replacing with a higher gas price..."
+          `Pending transactions detected: from nonce ${nonce} to ${
+            pendingNonce - 1
+          }`
         );
-        const cancelTx = {
-          nonce: web3.utils.toHex(nonce),
-          gasPrice: web3.utils.toHex(
-            maxFeePerGas + BigInt(web3.utils.toWei("5", "gwei")) // Add buffer for cancellation
-          ),
-          gasLimit: web3.utils.toHex(21000), // Standard gas limit
-          to: senderAddress, // Self-transfer
-          value: "0x0",
-          chainId: web3.utils.toHex(transactionData.network.chainId),
-        };
 
-        const signedCancelTx = await web3.eth.accounts.signTransaction(
-          cancelTx,
-          privateKey
-        );
-        await web3.eth.sendSignedTransaction(signedCancelTx.rawTransaction);
+        for (let nonceInfo = nonce; nonceInfo < pendingNonce; nonceInfo++) {
+          const cancelTx = {
+            nonce: web3.utils.toHex(nonceInfo), // Use loop variable nonceInfo
+            gasPrice: web3.utils.toHex(
+              maxFeePerGas + BigInt(web3.utils.toWei("5", "gwei")) // Add buffer for cancellation
+            ),
+            gasLimit: web3.utils.toHex(21000), // Standard gas limit
+            to: senderAddress, // Self-transfer
+            value: "0x0",
+            chainId: web3.utils.toHex(transactionData.network.chainId),
+          };
+
+          const signedCancelTx = await web3.eth.accounts.signTransaction(
+            cancelTx,
+            privateKey
+          );
+
+          try {
+            const receipt = await web3.eth.sendSignedTransaction(
+              signedCancelTx.rawTransaction
+            );
+            console.log(
+              `Cancellation transaction with nonce ${nonceInfo} sent successfully.`,
+              receipt.transactionHash
+            );
+          } catch (error) {
+            console.error(
+              `Failed to cancel transaction with nonce ${nonceInfo}:`,
+              error.message
+            );
+            break; // Stop if cancellation fails
+          }
+        }
       }
 
       // Token Transfer
@@ -186,7 +227,7 @@ const DisplayTransaction = ({ transactionData }) => {
             setTransactionReceiptInfo(receipt);
             setLoading(false);
             const status = Number(receipt?.status);
-            if (status == 1) {
+            if (status === 1) {
               // localStorage.removeItem("dataToSend");
               history.push("/wallet");
             }
@@ -198,7 +239,9 @@ const DisplayTransaction = ({ transactionData }) => {
           //   );
           // })
           .on("error", (error) => {
+            setLoading(false);
             console.error("Transaction Error:", error);
+
             alert("Transaction failed: " + error.message);
           });
       } else {
@@ -207,8 +250,11 @@ const DisplayTransaction = ({ transactionData }) => {
         );
       }
     } catch (error) {
+      setLoading(false);
       console.error("Transaction Failed:", error.message);
       alert("Transaction failed: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
