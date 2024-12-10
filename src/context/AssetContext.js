@@ -28,7 +28,7 @@ export const AssetProvider = ({ children }) => {
     if (selectedNetworkInfo) {
       setSelectedAsset({
         balance: selectedNetworkInfo.balance,
-        tokenAddress: selectedNetworkInfo.account,
+        tokenAddress: null,
         tokenBalance: null,
         tokenChainId: selectedNetworkInfo.chainId,
         tokenChainIdHex: selectedNetworkInfo.hex,

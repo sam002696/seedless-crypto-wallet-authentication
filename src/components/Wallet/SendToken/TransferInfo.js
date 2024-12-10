@@ -42,9 +42,9 @@ const TransferInfo = ({ transactionData }) => {
       <div className="px-5 py-5 bg-gray-100">
         <div>
           <p>
-            {transactionData?.transactionDetails?.tokenAddress.slice(0, 10)}
+            {transactionData?.transactionDetails?.tokenAddress?.slice(0, 10)}
             ...
-            {transactionData?.transactionDetails?.tokenAddress.slice(-8)}
+            {transactionData?.transactionDetails?.tokenAddress?.slice(-8)}
           </p>
         </div>
         <div className="mt-3">

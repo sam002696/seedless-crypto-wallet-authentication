@@ -46,6 +46,8 @@ const SendFromTo = ({ openCryptoTokenSend, setOpenCryptoTokenSend }) => {
   const { showAssetList } = useAssetList();
   const [selectedAccount, setSelectedAccount] = useState(userAccounts[0]);
 
+  console.log("selectedAsset", selectedAsset);
+
   const [isOpen, setIsOpen] = useState(false);
   const [showAsset, setShowAsset] = useState(false);
 

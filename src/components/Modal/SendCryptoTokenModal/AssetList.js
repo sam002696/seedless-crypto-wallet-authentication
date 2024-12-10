@@ -32,7 +32,7 @@ const AssetList = () => {
   const handleNativeNetworkInfo = () => {
     const defaultAsset = {
       balance: selectedNetworkInfo.balance,
-      tokenAddress: selectedNetworkInfo.account,
+      tokenAddress: null,
       tokenBalance: null,
       tokenChainId: selectedNetworkInfo.chainId,
       tokenChainIdHex: selectedNetworkInfo.hex,

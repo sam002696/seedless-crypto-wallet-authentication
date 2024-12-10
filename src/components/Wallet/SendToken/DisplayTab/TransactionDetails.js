@@ -58,12 +58,12 @@ const TransactionDetails = ({ transactionData }) => {
                     -{transactionData?.transactionDetails?.amount}
                   </p>
                   <p className="px-2 py-1 rounded-xl text-gray-700 bg-gray-100 text-xl">
-                    {transactionData?.transactionDetails?.tokenAddress.slice(
+                    {transactionData?.transactionDetails?.tokenAddress?.slice(
                       0,
                       10
                     )}
                     ...
-                    {transactionData?.transactionDetails?.tokenAddress.slice(
+                    {transactionData?.transactionDetails?.tokenAddress?.slice(
                       -8
                     )}
                   </p>
