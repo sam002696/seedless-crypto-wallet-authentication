@@ -4,8 +4,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { selectToastAlert } from "../../reducers/toastAlertSlice";
 
-const ToastAlert = (props) => {
-  const { type, message } = useSelector(selectToastAlert);
+const ToastAlert = (type, message) => {
+  // const { type, message } = useSelector(selectToastAlert);
 
   // console.log(type, message);
 

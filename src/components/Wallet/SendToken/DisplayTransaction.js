@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import Web3 from "web3";
 import { AuthUser } from "../../../helpers/AuthUser";
 import { Network } from "../../../helpers/Network";
+import { ToastAlert } from "../../../notification";
 
 const DisplayTransaction = ({ transactionData }) => {
   const savedGasType = localStorage.getItem("selectedGasFeeType");
@@ -47,6 +48,9 @@ const DisplayTransaction = ({ transactionData }) => {
   const confirmTransaction = async () => {
     try {
       setLoading(true);
+
+      ToastAlert("info", "Transaction process started...");
+
       const privateKey = AuthUser.getPrivateKey();
       const senderAddress = transactionData.sender.address;
       const receiverAddress = transactionData.receiver.address;
@@ -55,6 +59,13 @@ const DisplayTransaction = ({ transactionData }) => {
       console.log("Starting transaction process...");
       console.log("Sender Address:", senderAddress);
       console.log("Receiver Address:", receiverAddress);
+
+      // Fetch sender's balance
+      const balance = BigInt(await web3.eth.getBalance(senderAddress));
+      console.log(
+        "Sender Balance:",
+        web3.utils.fromWei(balance.toString(), "ether")
+      );
 
       // Fetch nonce
       const nonce = await web3.eth.getTransactionCount(senderAddress, "latest");
@@ -89,6 +100,25 @@ const DisplayTransaction = ({ transactionData }) => {
 
       console.log("Max Priority Fee Per Gas:", maxPriorityFeePerGas.toString());
       console.log("Max Fee Per Gas:", maxFeePerGas.toString());
+
+      // Estimate gas cost
+      const gasLimit = 21000n; // Standard gas limit for ETH transfers
+      const estimatedGasCost = gasLimit * maxFeePerGas;
+
+      console.log(
+        "Estimated Gas Cost:",
+        web3.utils.fromWei(estimatedGasCost.toString(), "ether")
+      );
+
+      // Ensure sufficient balance
+      if (balance < estimatedGasCost) {
+        ToastAlert(
+          "error",
+          "Insufficient funds to cover the transaction gas cost."
+        );
+        setLoading(false);
+        return;
+      }
 
       // Check for pending transactions
       const pendingNonce = await web3.eth.getTransactionCount(
@@ -140,6 +170,7 @@ const DisplayTransaction = ({ transactionData }) => {
       // Token Transfer
       if (tokenAddress) {
         console.log("Token Transfer Detected");
+        ToastAlert("info", "Token transfer initiated...");
 
         const tokenContract = new web3.eth.Contract(
           [
@@ -196,7 +227,7 @@ const DisplayTransaction = ({ transactionData }) => {
           nonce: web3.utils.toHex(nonce),
           maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
           maxFeePerGas: web3.utils.toHex(maxFeePerGas),
-          gasLimit: 2000000,
+          gasLimit: 200000,
           to: tokenAddress,
           data: data,
           chainId: web3.utils.toHex(transactionData.network.chainId),
@@ -219,13 +250,17 @@ const DisplayTransaction = ({ transactionData }) => {
           .on("transactionHash", (hash) => {
             console.log("Transaction Hash:", hash);
 
-            alert("Transaction sent successfully! Transaction Hash: " + hash);
+            // alert("Transaction sent successfully! Transaction Hash: " + hash);
+            ToastAlert(
+              "success",
+              `Transaction sent successfully! Hash: ${hash}`
+            );
           })
           .on("receipt", (receipt) => {
             console.log("Transaction Receipt:", receipt);
-            alert("Transaction confirmed!");
+            // alert("Transaction confirmed!");
+            ToastAlert("success", "Transaction confirmed!");
             setTransactionReceiptInfo(receipt);
-            setLoading(false);
             const status = Number(receipt?.status);
             if (status === 1) {
               // localStorage.removeItem("dataToSend");
@@ -242,19 +277,81 @@ const DisplayTransaction = ({ transactionData }) => {
             setLoading(false);
             console.error("Transaction Error:", error);
 
+            // if (error.message.includes("insufficient funds")) {
+            //   ToastAlert(
+            //     "error",
+            //     "Insufficient funds for gas and transaction value."
+            //   );
+            // } else {
+            //   ToastAlert("error", `Transaction failed: ${error.message}`);
+            // }
+
             alert("Transaction failed: " + error.message);
+          })
+          .finally(() => {
+            setLoading(false);
+            // ToastAlert("info", "Transaction process completed.");
           });
       } else {
-        throw new Error(
-          "Token address not provided. Unable to process transaction."
+        console.log("Native Balance Transfer Detected");
+
+        const valueToSend = web3.utils.toWei(amount.toString(), "ether"); // Convert amount to Wei
+        console.log("Amount to Send in Wei:", valueToSend);
+
+        // Prepare transaction object
+        const tx = {
+          nonce: web3.utils.toHex(nonce),
+          maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
+          maxFeePerGas: web3.utils.toHex(maxFeePerGas),
+          gasLimit: 21000, // Standard gas limit for ETH transfer
+          to: receiverAddress,
+          value: web3.utils.toHex(valueToSend),
+          chainId: web3.utils.toHex(transactionData.network.chainId),
+        };
+
+        console.log("Native Transaction Object:", tx);
+
+        // Sign and send the transaction
+        const signedTx = await web3.eth.accounts.signTransaction(
+          tx,
+          privateKey
         );
+        console.log("Signed Native Transaction:", signedTx);
+
+        const promiEvent = web3.eth.sendSignedTransaction(
+          signedTx.rawTransaction
+        );
+
+        promiEvent
+          .on("transactionHash", (hash) => {
+            console.log("Native Transaction Hash:", hash);
+            alert("Transaction sent successfully! Transaction Hash: " + hash);
+          })
+          .on("receipt", (receipt) => {
+            console.log("Native Transaction Receipt:", receipt);
+            alert("Transaction confirmed!");
+            setTransactionReceiptInfo(receipt);
+
+            // const status = Number(receipt?.status);
+            // if (status === 1) {
+            //   history.push("/wallet");
+            // }
+          })
+          .on("error", (error) => {
+            console.error("Native Transaction Error:", error);
+            alert("Transaction failed: " + error.message);
+          })
+          .finally(() => {
+            setLoading(false);
+            // ToastAlert("info", "Transaction process completed.");
+          });
       }
     } catch (error) {
       setLoading(false);
       console.error("Transaction Failed:", error.message);
-      alert("Transaction failed: " + error.message);
-    } finally {
-      setLoading(false);
+      // alert("Transaction failed: " + error.message);
+
+      ToastAlert("error", `Transaction failed: ${error.message}`);
     }
   };
 
