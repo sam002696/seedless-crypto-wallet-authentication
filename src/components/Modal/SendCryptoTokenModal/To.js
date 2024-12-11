@@ -77,7 +77,7 @@ const To = ({ setShowAsset, showAsset, assetInput, updateAssetInput }) => {
         {isValid ? (
           <div className="flex items-center justify-between">
             <p className="text-gray-900">
-              {displayAddress.slice(0, 10)}...${displayAddress.slice(-8)}
+              {displayAddress.slice(0, 10)}...{displayAddress.slice(-8)}
             </p>
             <button
               type="button"
