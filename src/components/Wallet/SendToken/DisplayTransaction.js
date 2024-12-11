@@ -401,12 +401,47 @@ const DisplayTransaction = ({ transactionData }) => {
   }) => {
     // Check network congestion
     const networkCongestion = gasFees.networkCongestion;
-    if (networkCongestion > 0.75) {
+    if (networkCongestion < 0.3) {
+      ToastAlert(
+        "success",
+        "The network is stable. Transactions are likely to process quickly."
+      );
+    } else if (networkCongestion >= 0.3 && networkCongestion <= 0.75) {
+      ToastAlert(
+        "info",
+        "The network is moderately congested. Transactions may experience slight delays."
+      );
+      console.log("Network is moderately congested. Adjusting gas fees...");
+    } else if (networkCongestion > 0.75 && networkCongestion <= 0.9) {
       ToastAlert(
         "warning",
-        "The network is highly congested. Transactions may be delayed or reverted. Consider waiting for better conditions."
+        "The network is highly congested. Transactions may be delayed or reverted. Proceeding with caution."
       );
-      // console.warn("Network is highly congested. Proceeding with caution.");
+      console.warn("Network is highly congested. Proceeding with caution.");
+    } else if (networkCongestion > 0.9) {
+      ToastAlert(
+        "error",
+        "The network is extremely congested. Transactions are unlikely to succeed. Please wait for better conditions."
+      );
+      console.error("Network is extremely congested. Halting transaction.");
+      return false;
+    }
+
+    if (gasFees.baseFeeTrend === "up" && gasFees.priorityFeeTrend === "up") {
+      ToastAlert(
+        "warning",
+        "Gas fees are rising rapidly. Transactions may incur higher costs."
+      );
+      console.warn("Gas fees are rising rapidly. Proceeding with caution.");
+    } else if (
+      gasFees.baseFeeTrend === "down" &&
+      gasFees.priorityFeeTrend === "down"
+    ) {
+      ToastAlert(
+        "success",
+        "Gas fees are declining. Proceeding with transaction."
+      );
+      console.log("Gas fees are declining. Proceeding with transaction.");
     }
 
     // Ensure sufficient balance
