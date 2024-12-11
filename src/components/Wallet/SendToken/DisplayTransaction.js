@@ -103,6 +103,30 @@ const DisplayTransaction = ({ transactionData }) => {
 
       // Estimate gas cost
       const gasLimit = 21000n; // Standard gas limit for ETH transfers
+
+      // is transfer feasible
+
+      const valueToSend = web3.utils.toWei(amount.toString(), "ether");
+      console.log("Value to Send in Wei:", valueToSend);
+
+      // Handle network conditions and simulate transaction
+      const isTransactionFeasible = await handleNetworkConditionsAndSimulate({
+        gasFees,
+        valueToSend,
+        senderAddress,
+        receiverAddress,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        gasLimit,
+        balance,
+        tokenAddress,
+      });
+
+      if (!isTransactionFeasible) {
+        setLoading(false);
+        return;
+      }
+
       const estimatedGasCost = gasLimit * maxFeePerGas;
 
       console.log(
@@ -362,6 +386,74 @@ const DisplayTransaction = ({ transactionData }) => {
 
       ToastAlert("error", `Transaction failed: ${error.message}`);
     }
+  };
+
+  const handleNetworkConditionsAndSimulate = async ({
+    gasFees,
+    valueToSend,
+    senderAddress,
+    receiverAddress,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    gasLimit,
+    balance,
+    tokenAddress,
+  }) => {
+    // Check network congestion
+    const networkCongestion = gasFees.networkCongestion;
+    if (networkCongestion > 0.75) {
+      ToastAlert(
+        "warning",
+        "The network is highly congested. Transactions may be delayed or reverted. Consider waiting for better conditions."
+      );
+      // console.warn("Network is highly congested. Proceeding with caution.");
+    }
+
+    // Ensure sufficient balance
+    const estimatedGasCost = BigInt(gasLimit) * maxFeePerGas;
+
+    // Calculate total cost
+    const totalCost = tokenAddress
+      ? estimatedGasCost // For token transfers, only gas cost matters
+      : BigInt(valueToSend) + estimatedGasCost;
+
+    if (balance < totalCost) {
+      ToastAlert(
+        "error",
+        `Insufficient funds: Required ${web3.utils.fromWei(
+          totalCost.toString(),
+          "ether"
+        )} ETH, but only ${web3.utils.fromWei(
+          balance.toString(),
+          "ether"
+        )} ETH available.`
+      );
+      console.error("Insufficient funds for transaction.");
+      return false;
+    }
+
+    // Simulate the transaction
+    try {
+      console.log("Simulating transaction...");
+      await web3.eth.call({
+        from: senderAddress,
+        to: receiverAddress,
+        value: tokenAddress ? "0x0" : web3.utils.toHex(BigInt(valueToSend)),
+        gas: web3.utils.toHex(gasLimit),
+        maxFeePerGas: web3.utils.toHex(maxFeePerGas),
+        maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
+      });
+      console.log("Transaction simulation successful.");
+    } catch (simulationError) {
+      ToastAlert(
+        "error",
+        `Transaction simulation failed: ${simulationError.message}`
+      );
+      console.error("Transaction simulation failed:", simulationError.message);
+      return false;
+    }
+
+    return true;
   };
 
   const displayTabContent = () => {
