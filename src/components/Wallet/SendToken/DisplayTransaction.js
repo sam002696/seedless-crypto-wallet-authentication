@@ -295,6 +295,8 @@ const DisplayTransaction = ({ transactionData }) => {
       } else {
         console.log("Native Balance Transfer Detected");
 
+        ToastAlert("info", "Native balance transfer initiated...");
+
         const valueToSend = web3.utils.toWei(amount.toString(), "ether"); // Convert amount to Wei
         console.log("Amount to Send in Wei:", valueToSend);
 
@@ -303,9 +305,9 @@ const DisplayTransaction = ({ transactionData }) => {
           nonce: web3.utils.toHex(nonce),
           maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFeePerGas),
           maxFeePerGas: web3.utils.toHex(maxFeePerGas),
-          gasLimit: 21000, // Standard gas limit for ETH transfer
+          gasLimit: web3.utils.toHex(21000), // Standard gas limit for ETH transfer
           to: receiverAddress,
-          value: web3.utils.toHex(valueToSend),
+          value: web3.utils.toHex(BigInt(valueToSend)),
           chainId: web3.utils.toHex(transactionData.network.chainId),
         };
 
@@ -325,21 +327,28 @@ const DisplayTransaction = ({ transactionData }) => {
         promiEvent
           .on("transactionHash", (hash) => {
             console.log("Native Transaction Hash:", hash);
-            alert("Transaction sent successfully! Transaction Hash: " + hash);
+            // alert("Transaction sent successfully! Transaction Hash: " + hash);
+
+            ToastAlert(
+              "success",
+              "Transaction sent successfully! Transaction Hash: " + hash
+            );
           })
           .on("receipt", (receipt) => {
             console.log("Native Transaction Receipt:", receipt);
-            alert("Transaction confirmed!");
+            // alert("Transaction confirmed!");
+            ToastAlert("success", "Transaction confirmed!");
             setTransactionReceiptInfo(receipt);
 
-            // const status = Number(receipt?.status);
-            // if (status === 1) {
-            //   history.push("/wallet");
-            // }
+            const status = Number(receipt?.status);
+            if (status === 1) {
+              history.push("/wallet");
+            }
           })
           .on("error", (error) => {
             console.error("Native Transaction Error:", error);
-            alert("Transaction failed: " + error.message);
+            ToastAlert("error", "Transaction failed: " + error.message);
+            // alert("Transaction failed: " + error.message);
           })
           .finally(() => {
             setLoading(false);
