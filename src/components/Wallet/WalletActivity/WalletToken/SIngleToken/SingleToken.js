@@ -4,6 +4,7 @@ import SingleTokenActivity from "./SingleTokenActivity";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useTokenView } from "../../../../../context/TokenViewContext";
 import { Token } from "../../../../../helpers/Token";
+import TokenTransactions from "./TokenTransactions";
 
 const SingleToken = () => {
   const { setIsTokenView, selectedToken } = useTokenView();
@@ -77,7 +78,8 @@ const SingleToken = () => {
         {/* Token Info and Activity Components */}
         <div className="p-5">
           <SingleTokenInfo token={token} setToken={setToken} />
-          <SingleTokenActivity token={token} setToken={setToken} />
+          {/* <SingleTokenActivity token={token} setToken={setToken} /> */}
+          <TokenTransactions />
         </div>
       </div>
     </>
