@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
+import { AuthUser } from "../../../../../helpers/AuthUser";
+import { Network } from "../../../../../helpers/Network";
 
 const ERC20_ABI = [
   {
@@ -26,13 +28,12 @@ const ERC20_ABI = [
   },
 ];
 
-const TokenTransactions = () => {
+const TokenTransactions = ({ token }) => {
   const [transactions, setTransactions] = useState([]);
 
-  const infuraUrl =
-    "https://sepolia.infura.io/v3/75573f1a11f84a848d4e7292fe2fb5b9";
-  const tokenAddress = "0x8E2fC77A7cc7A3d3A8Bb006aaE655475Fd171Ac0";
-  const accountAddress = "0x35642E4c431e893DeFd805644c33BBFF3077a56D";
+  const infuraUrl = Network.getNetworkRpcUrl();
+  const tokenAddress = token;
+  const accountAddress = AuthUser.getPublicKey();
 
   const web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
   const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);

@@ -79,7 +79,7 @@ const SingleToken = () => {
         <div className="p-5">
           <SingleTokenInfo token={token} setToken={setToken} />
           {/* <SingleTokenActivity token={token} setToken={setToken} /> */}
-          <TokenTransactions />
+          <TokenTransactions token={token} />
         </div>
       </div>
     </>
